@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <NuxtWelcome /> -->
-    <h1 class="text-secondary">{{ t('hello', { name: 'vue-i18n' }) }}</h1>
+    <h1 class="text-primary">{{ t('hello', { name: 'vue-i18n' }) }}</h1>
     <form>
       <label for="locale-select">{{ $t('language') }}: </label>
       <select id="locale-select" v-model="$i18n.locale">

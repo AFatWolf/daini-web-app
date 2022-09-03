@@ -1,7 +1,19 @@
+// Required
+@import '@/node_modules/bootstrap/scss/functions';
+@import '@/node_modules/bootstrap/scss/variables';
+@import '@/node_modules/bootstrap/scss/mixins';
+
 $primary: #ec7a5c;
 
 $theme-colors: (
   'primary': $primary,
+);
+
+$font-sizes: map-merge(
+  (
+    64: $font-size-base * 4,
+  ),
+  $font-sizes
 );
 
 @import '@/node_modules/bootstrap/scss/bootstrap.scss';

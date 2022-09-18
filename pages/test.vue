@@ -1,7 +1,6 @@
 <template>
   <div>
     <!-- <NuxtWelcome /> -->
-    <tag-image />
     <h1 class="text-primary">{{ t('hello', { name: 'vue-i18n' }) }}</h1>
     <FormKit
       type="text"

@@ -8,14 +8,18 @@
         <FormKit type="form" :actions="false" @submit="onSubmit">
           <div class="d-flex flex-column justify-content-center mb-4">
             <FormKit
+              v-model="model.username"
               type="text"
+              name="username"
               :label="$t('common.name')"
               label-class="text-white fs-5"
               outer-class="mb-3"
               input-class="w-100 p-2"
             />
             <FormKit
+              v-model="model.password"
               type="password"
+              name="password"
               :label="$t('common.password')"
               label-class="text-white fs-5"
               input-class="w-100 p-2"
@@ -34,7 +38,7 @@
                 fs-4
               "
             >
-              {{ $t('signup') }}
+              {{ $t('login') }}
             </button>
           </div>
         </FormKit>
@@ -44,10 +48,34 @@
 </template>
 
 <script>
+// import { ISignUpParams } from '@/interfaces/auth'
+import { useAuthStore } from '@/stores/auth'
+
 export default {
+  props: {
+    modelValue: {
+      type: Object,
+      default: {
+        username: '',
+        password: '',
+      },
+    },
+  },
+  setup(props, emit) {
+    const model = computed({
+      get: () => props.modelValue,
+      set: (value) => emit('update:modelValue', value),
+    })
+    const authStore = useAuthStore()
+
+    return {
+      model,
+      authStore,
+    }
+  },
   methods: {
     onSubmit() {
-      alert('Log In')
+      this.authStore.logIn(this.model)
     },
   },
 }

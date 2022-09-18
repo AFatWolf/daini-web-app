@@ -3,15 +3,15 @@
  * @module useGun
  */
 
-import Gun from "gun/gun";
-import "gun/lib/then";
-import "gun/lib/radix";
-import "gun/lib/radisk";
-import "gun/lib/store";
-import "gun/lib/rindexed";
-import "gun/lib/webrtc";
-import "gun/lib/not"
-import "gun/nts";
+import Gun from "gun/gun.js";
+import "gun/lib/then.js";
+import "gun/lib/radix.js";
+import "gun/lib/radisk.js";
+import "gun/lib/store.js";
+import "gun/lib/rindexed.js";
+import "gun/lib/webrtc.js";
+import "gun/lib/not.js"
+import "gun/nts.js";
 
 
 // polyfiils for Gun 0.2020.1236

@@ -76,6 +76,7 @@ export default {
   methods: {
     onSubmit() {
       this.authStore.logIn(this.model)
+      if (this.authStore.isLoggedIn) this.$emit('loggedIn')
     },
   },
 }

@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import { ILogInParams, ISignUpParams } from '@/interfaces/auth'
 import { useGun } from '@gun-vue/composables'
-import { findLastKey } from 'lodash'
 
 interface IAuthState {
   isLoggedIn: boolean
   // TODO: replace with IUser
   userInfo: Object
+  // user Reference in GUN DB
+  userRef: Object
   loading: {
     userInfo: boolean
   }
@@ -16,6 +17,7 @@ export const useAuthStore = defineStore('auth', {
   state: (): IAuthState => ({
     isLoggedIn: false,
     userInfo: {},
+    userRef: {},
     loading: {
       userInfo: false,
     },
@@ -28,6 +30,10 @@ export const useAuthStore = defineStore('auth', {
     getSeaKeys() {
       return this.userInfo.sea
     },
+    getUsername() {
+      return this.userInfo.username || ''
+    },
+    getUserRef: (state) => state.userRef || null,
   },
   actions: {
     signUp(body: ILogInParams) {
@@ -47,9 +53,15 @@ export const useAuthStore = defineStore('auth', {
         this.loading.userInfo = false
         this.isLoggedIn = true
         this.userInfo = ack
+        this.userInfo.username = body.username
         console.log(ack)
         console.log('userinfo', this.userInfo)
       })
+      this.fetchUserRef()
+    },
+    fetchUserRef() {
+      const gun = useGun()
+      this.userRef = gun.user(this.getUsername)
     },
   },
 })

@@ -50,6 +50,7 @@
 <script>
 // import { ISignUpParams } from '@/interfaces/auth'
 import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 
 export default {
   props: {
@@ -67,16 +68,22 @@ export default {
       set: (value) => emit('update:modelValue', value),
     })
     const authStore = useAuthStore()
+    const { isLoggedIn } = storeToRefs(authStore)
 
     return {
       model,
       authStore,
+      isLoggedIn,
     }
+  },
+  watch: {
+    isLoggedIn(isCurrentlyLoggedIn) {
+      if (isCurrentlyLoggedIn) this.$emit('loggedIn')
+    },
   },
   methods: {
     onSubmit() {
       this.authStore.logIn(this.model)
-      if (this.authStore.isLoggedIn) this.$emit('loggedIn')
     },
   },
 }

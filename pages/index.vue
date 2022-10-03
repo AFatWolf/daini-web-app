@@ -6,6 +6,15 @@
     <div>
       <Anchor to="/signup">Sign Up</Anchor>
     </div>
+    <div>
+      <Anchor to="/sell">Sell Items</Anchor>
+    </div>
+    <div>
+      <Anchor to="/test">Test Items</Anchor>
+    </div>
+    <div>
+      <Anchor to="/market">Market to buy items</Anchor>
+    </div>
   </div>
 </template>
 

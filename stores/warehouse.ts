@@ -6,6 +6,8 @@ import { useAuthStore } from './auth'
 
 interface IWarehouseState {
   products: IProduct[]
+  // Type: {string: IProduct}
+  productsBySoul: Object
   souls: string[]
   loading: {
     fetchWarehouse: boolean
@@ -15,23 +17,28 @@ interface IWarehouseState {
 export const useWarehouseStore = defineStore('warehouse', {
   state: (): IWarehouseState => ({
     products: [],
+    productsBySoul: {},
     souls: [],
     loading: {
       fetchWarehouse: false,
     },
   }),
   getters: {
-    getProductList: (state) => state.products || [],
+    getProductList: (state) => {
+      const souls = Object.keys(state.productsBySoul)
+      return useMap(souls, (soul) => state.productsBySoul[soul] || null)
+    },
     getProductBySoul: (state) => {
       return (soul) => {
-        const index = useFindIndex(state.souls, (_soul) => _soul === soul)
-
-        return index !== -1 ? state.products[index] : null
+        return state.productsBySoul[soul] || null
       }
     },
   },
   actions: {
     fetchProducts() {
+      // If already fetched and set up listener
+      if (!isEmpty(this.productsBySoul)) return
+
       const authStore = useAuthStore()
       const userRef = authStore.getUserRef
       const gun = useGun()
@@ -41,16 +48,15 @@ export const useWarehouseStore = defineStore('warehouse', {
       userRef
         .get(WAREHOUSE_KEY)
         .map()
-        .once((data) => {
+        .on((data) => {
           console.log('Warehouse:', data)
-
           if (typeof data === 'object' && data) {
             const soul = getProductGunSoul(data)
 
             if (!soul) return
 
             this.souls.push(soul)
-            this.products.push(data)
+            this.productsBySoul[soul] = data
           }
         })
     },

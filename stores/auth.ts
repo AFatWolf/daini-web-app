@@ -3,7 +3,6 @@ import { ILogInParams, ISignUpParams } from '@/interfaces/auth'
 import { useGun } from '@gun-vue/composables'
 
 interface IAuthState {
-  isLoggedIn: boolean
   // TODO: replace with IUser
   userInfo: Object
   // user Reference in GUN DB
@@ -15,7 +14,6 @@ interface IAuthState {
 
 export const useAuthStore = defineStore('auth', {
   state: (): IAuthState => ({
-    isLoggedIn: false,
     userInfo: {},
     userRef: {},
     loading: {
@@ -34,8 +32,22 @@ export const useAuthStore = defineStore('auth', {
       return this.userInfo.username || ''
     },
     getUserRef: (state) => state.userRef || null,
+    isLoggedIn: () => {
+      return useGun().user.is
+    },
   },
   actions: {
+    recall() {
+      const gun = useGun()
+      const user = gun.user().recall({ sessionStorage: true }, (ack) => {
+        this.loading.userInfo = false
+        this.userInfo = ack
+        console.log(ack)
+        console.log('userinfo', this.userInfo)
+      })
+      this.fetchUserRef()
+      return user
+    },
     signUp(body: ILogInParams) {
       const gun = useGun()
       const user = gun.user()
@@ -46,22 +58,25 @@ export const useAuthStore = defineStore('auth', {
     },
     logIn(body: ISignUpParams) {
       const gun = useGun()
-      const user = gun.user()
-
-      this.loading.userInfo = true
-      user.auth(body.username, body.password, (ack) => {
+      const onLogin = (ack) => {
         this.loading.userInfo = false
-        this.isLoggedIn = true
         this.userInfo = ack
         this.userInfo.username = body.username
         console.log(ack)
         console.log('userinfo', this.userInfo)
-      })
+      }
+
+      const user = gun.user().recall({ sessionStorage: true })
+
+      this.loading.userInfo = true
+      user.auth(body.username, body.password, onLogin)
       this.fetchUserRef()
     },
     fetchUserRef() {
-      const gun = useGun()
-      this.userRef = gun.user(this.getUsername)
+      this.userRef = this.userInfo['$']
     },
+    logOut() {
+      useGun().user.leave()
+    }
   },
 })

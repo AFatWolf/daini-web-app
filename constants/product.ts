@@ -3,6 +3,12 @@ export enum PRODUCT_STATUS {
     SOLD,
 }
 
+export enum ITEM_STATUS {
+    AVAILABLE,
+    IN_TRANSACTION,
+    SOLD,
+}
+
 export const MAX_ITEMS_TO_SELL = 50
 
 export const MIN_PRICE_YEN = 100

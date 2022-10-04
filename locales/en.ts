@@ -10,6 +10,7 @@ export default {
     password_confirm: 'Re-Enter Password',
     quantity: 'Quantity',
     purchase: 'Purchase',
+    view: 'View',
   },
   item: {
     sell: {

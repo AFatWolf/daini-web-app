@@ -1,4 +1,4 @@
-import { PRODUCT_STATUS } from '@/constants/product'
+import { ITEM_STATUS, PRODUCT_STATUS } from '@/constants/product'
 
 export interface IProduct {
   id?: string
@@ -18,8 +18,7 @@ export interface IProduct {
 }
 
 export interface IItem {
-  // Item list will be a linked list
-  nextItemRef?: string
+  status?: ITEM_STATUS
   // JSON for keyPair
   keyPairJSON?: string
 }

@@ -103,10 +103,10 @@ export default {
       //     console.log('Product:', data)
       //     console.log(data.price)
       //   })
-      useGun().get(WAREHOUSE_KEY).get('Rope').once((data) => {
+      useGunDb().get(WAREHOUSE_KEY).get('Rope').once((data) => {
         console.log('Data', data)
       })
-
+      useGun().get('test-25122000/warehouse/betsuyon/items')
       const warehouse = useGun()
         .user('hiKtty2')
         .get(WAREHOUSE_KEY)

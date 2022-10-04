@@ -35,7 +35,7 @@ export const useWarehouseStore = defineStore('warehouse', {
       const authStore = useAuthStore()
       const userRef = authStore.getUserRef
       const gun = useGun()
-      debugger
+
       if (!userRef) return
 
       userRef
@@ -51,10 +51,6 @@ export const useWarehouseStore = defineStore('warehouse', {
 
             this.souls.push(soul)
             this.products.push(data)
-            debugger
-            // gun.get(soul).once((data) => {
-            //   this.products.push(data)
-            // })
           }
         })
     },

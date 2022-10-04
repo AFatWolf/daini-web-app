@@ -1,6 +1,6 @@
 <template>
   <!-- TODO: check if projectdetail not null -->
-  <div class="d-flex flex-column align-items-start">
+  <div v-if="productDetail" class="d-flex flex-column align-items-start">
     <div class="d-flex flex-row fs-3 text-dark">
       <div>{{ $t('common.name') }}:&nbsp</div>
       <div>{{ productDetail.name }}</div>

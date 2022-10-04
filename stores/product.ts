@@ -66,19 +66,32 @@ export const useProductStore = defineStore('item-stock', {
         }
       }
 
+      const linkProductToOwner = () => {
+        const productRef = gun.get(WAREHOUSE_KEY).get(product.id)
+        debugger
+        // Link product Reference to user
+        userRef.get(WAREHOUSE_KEY).set(productRef, (ack) => {
+          if (ack.error) {
+            console.log('Cannot put item in owner.', ack)
+          } else {
+            console.log('Put item in owner.', ack)
+          }
+        })
+      }
+
       this.loading.sellProduct = true
-      const productRef = gun.get(WAREHOUSE_KEY).put(putProduct, (ack) => {
+      gun.get(WAREHOUSE_KEY).put(putProduct, (ack) => {
         if (ack.err) {
           console.log(ack)
         } else {
-          console.log('Sell successfully')
           generateKeys()
+          const soul = ack['#']
+          console.log('Ack: ', ack)
+          linkProductToOwner()
+          console.log('Sell successfully')
         }
         this.loading.sellProduct = false
       })
-
-      // Link product Reference to user
-      userRef.get(WAREHOUSE_KEY).set(productRef)
     },
   },
 })

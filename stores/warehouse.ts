@@ -23,11 +23,11 @@ export const useWarehouseStore = defineStore('warehouse', {
   getters: {
     getProductList: (state) => state.products || [],
     getProductBySoul: (state) => {
-      return (soul) =>
-        useFind(
-          state.products,
-          (product) => getGunNodeSoul(product) === soul
-        ) || null
+      return (soul) => {
+        const index = useFindIndex(state.souls, (_soul) => _soul === soul)
+
+        return index !== -1 ? state.products[index] : null
+      }
     },
   },
   actions: {
@@ -35,21 +35,26 @@ export const useWarehouseStore = defineStore('warehouse', {
       const authStore = useAuthStore()
       const userRef = authStore.getUserRef
       const gun = useGun()
+      debugger
       if (!userRef) return
 
       userRef
         .get(WAREHOUSE_KEY)
         .map()
         .once((data) => {
+          console.log('Warehouse:', data)
+
           if (typeof data === 'object' && data) {
             const soul = getProductGunSoul(data)
 
             if (!soul) return
 
             this.souls.push(soul)
-            gun.get(soul).once((data) => {
-              this.products.push(data)
-            })
+            this.products.push(data)
+            debugger
+            // gun.get(soul).once((data) => {
+            //   this.products.push(data)
+            // })
           }
         })
     },

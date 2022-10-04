@@ -5,8 +5,9 @@
  */
 export const getProductGunSoul = (nodeRef) => {
   for (const key of Object.keys(nodeRef)) {
-    if (key === '_') continue
+    if (key !== '_') continue
     const obj = nodeRef[key] // key == id of the product
-    return obj ? obj['#'] || false : false
+    if(obj && obj['#']) return obj['#']
   }
+  return false
 }

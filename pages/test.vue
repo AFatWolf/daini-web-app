@@ -103,13 +103,12 @@ export default {
       //     console.log('Product:', data)
       //     console.log(data.price)
       //   })
-
-      useGun().get('l8tdkjl0XkwMjkKU4pLG').once((data) => {
-        console.log('Paper data', data)
+      useGun().get(WAREHOUSE_KEY).get('Rope').once((data) => {
+        console.log('Data', data)
       })
 
       const warehouse = useGun()
-        .user('helloKitty')
+        .user('hiKtty2')
         .get(WAREHOUSE_KEY)
         .map()
         .once((data) => {

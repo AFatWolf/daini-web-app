@@ -9,13 +9,16 @@ export default {
     password: 'Password',
     password_confirm: 'Re-Enter Password',
     quantity: 'Quantity',
+    purchase: 'Purchase',
   },
   item: {
     sell: {
         title: 'Item\'s Description',
         sell_item: 'Publish To Market',
         price: 'Price (yen)'
-    }
+    },
+    left: 'left',
+    price: 'Price',
   },
   market: {
     title: 'Market, where you can buy stuff'

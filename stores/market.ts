@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { ILogInParams, ISignUpParams } from '@/interfaces/auth'
 import { useGun } from '@gun-vue/composables'
 import { IProduct } from '@/interfaces/product'
 import { WAREHOUSE_KEY } from '~~/constants/common'
@@ -28,6 +27,7 @@ export const useMarketStore = defineStore('market', {
         .get(WAREHOUSE_KEY)
         .map()
         .once((data) => {
+          if(typeof data === 'object' && data)
           this.products.push(data)
         })
     },

@@ -15,6 +15,9 @@
     <div>
       <Anchor to="/market">Market to buy items</Anchor>
     </div>
+    <div>
+      <Anchor to="/warehouse">Warehouse to see our items</Anchor>
+    </div>
   </div>
 </template>
 

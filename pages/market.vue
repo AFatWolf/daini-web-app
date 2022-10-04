@@ -13,7 +13,6 @@ import { useMarketStore } from '@/stores/market'
 export default {
   setup() {
     const marketStore = useMarketStore()
-    marketStore.fetchProducts()
     
     return {
       marketStore,

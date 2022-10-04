@@ -94,17 +94,20 @@ export default {
       // console.log('Test', test)
 
       const gun = useGunDb()
-      const id = 'Kimetsu'
-      gun
-        .get(WAREHOUSE_KEY)
-        .get(id)
-        .get('items')
-        .map()
-        .once((data) => {
-          console.log('Product:', data)
-        })
+      const id = 'Roomba'
+      // gun
+      //   .get(WAREHOUSE_KEY)
+      //   .map()
 
-      
+      //   .once((data) => {
+      //     console.log('Product:', data)
+      //     console.log(data.price)
+      //   })
+
+      useGun().get('l8tdkjl0XkwMjkKU4pLG').once((data) => {
+        console.log('Paper data', data)
+      })
+
       const warehouse = useGun()
         .user('helloKitty')
         .get(WAREHOUSE_KEY)
@@ -112,7 +115,7 @@ export default {
         .once((data) => {
           console.log('77 Product:', data)
         })
-      console.log("Warehouse", warehouse)
+      console.log('Warehouse', warehouse)
     },
   },
 }

@@ -78,7 +78,7 @@ export const useProductStore = defineStore('item-stock', {
       })
 
       // Link product Reference to user
-      userRef.get(WAREHOUSE_KEY).set(product)
+      userRef.get(WAREHOUSE_KEY).set(productRef)
     },
   },
 })

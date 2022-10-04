@@ -13,28 +13,52 @@
       <div>{{ $t('item.price') }}:&nbsp</div>
       <div>{{ productDetail.price }}</div>
     </div>
+    <div v-for="(item, index) in items" :key="item">{{ index }}:&nbsp{{ item.status }}</div>
   </div>
 </template>
 
 <script>
 import { useWarehouseStore } from '@/stores/warehouse'
+import { useGun } from '@gun-vue/composables'
 
 export default {
   setup() {
     const warehouseStore = useWarehouseStore()
+    const appGun = useGunDb()
+    const gun = useGun()
 
     return {
       warehouseStore,
+      appGun,
+      gun,
     }
   },
   data() {
+    const { gun } = this
     const { productSoul } = getRouterParams(this)
     const productDetail = this.warehouseStore.getProductBySoul(productSoul)
+
+    const itemsSoul = getGunNodeSoul(productDetail.items)
+    const items = ref([])
+
+    gun
+      .get(itemsSoul)
+      .map()
+      .once((data) => {
+        console.log('Data: ', data)
+        items.value.push(data)
+      })
 
     return {
       productSoul,
       productDetail,
+      items,
     }
+  },
+  watch: {
+    items(newItems) {
+      console.log(newItems)
+    },
   },
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div v-for="item in items" :key="item.id">
+  <div class="container row">
+    <div class="col-3" v-for="item in items" :key="item.id">
       <WarehouseItem :item="item" />
     </div>
   </div>

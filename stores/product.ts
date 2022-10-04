@@ -3,6 +3,7 @@ import { IProduct, IItem } from '@/interfaces/product'
 import { WAREHOUSE_KEY } from '~~/constants/common'
 import { ec as EC } from 'elliptic'
 import { useAuthStore } from '@/stores/auth'
+import { ITEM_STATUS } from '~~/constants/product'
 
 const ec = new EC('secp256k1')
 
@@ -59,6 +60,7 @@ export const useProductStore = defineStore('item-stock', {
         for (let i = 0; i < product.totalQuantity; i++) {
           const keyPair = ec.genKeyPair()
           const item = {
+            status: ITEM_STATUS.AVAILABLE,
             keyPairJSON: JSON.stringify(keyPair),
           }
           gun.get(WAREHOUSE_KEY).get(product.id).get('items').set(item)

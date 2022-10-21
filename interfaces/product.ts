@@ -5,6 +5,7 @@ export interface IProduct {
   categories?: string[]
   name?: string
   description?: string
+  sellerAlias: string
   //   medias?: Media[] // WIP
   price?: number
   createdTime?: string

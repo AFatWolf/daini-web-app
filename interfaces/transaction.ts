@@ -1,16 +1,32 @@
-import { TRANSACTION_STATE } from '@/constants/transasction'
+import { TRANSACTION_STATE } from '~~/constants/transaction'
 
-export interface Side {
-    // Side info
+export interface ISide {
+  // Side info
+  alias?: string
+  epub?: string
+  epriv?: string // encrypted
 }
 
-export interface Transaction {
-    // IDs of Side
-    seller?: string
-    buyer?: string
-    meditator?: string
-    // ID of item
-    item?: string
+export interface ITransaction {
+  id: string
+  // Side info
+  seller?: ISide
+  buyer?: ISide
+  meditator?: ISide
+  // Product Info
+  product?: {
+    name?: string
+    soul: string
     quantity?: number
-    state?: TRANSACTION_STATE
+    price?: number
   }
+  state: TRANSACTION_STATE
+}
+
+export interface IOrder {
+  soul: string
+  name?: string
+  quantity?: number
+  price?: number
+  sellerAlias: string
+}

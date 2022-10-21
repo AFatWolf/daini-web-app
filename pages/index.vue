@@ -18,6 +18,9 @@
     <div>
       <Anchor to="/warehouse">Warehouse to see our items</Anchor>
     </div>
+    <div>
+      <Anchor to="/transactions">See our tansactions</Anchor>
+    </div>
   </div>
 </template>
 

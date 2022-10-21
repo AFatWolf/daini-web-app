@@ -28,12 +28,12 @@ export const useAuthStore = defineStore('auth', {
     getSeaKeys() {
       return this.userInfo.sea
     },
-    getUsername() {
-      return this.userInfo.username || ''
+    getUsername() { // get Alias
+      return useGun().user().is?.alias || 'anon'
     },
     getUserRef: (state) => state.userRef || null,
     isLoggedIn: () => {
-      return useGun().user.is
+      return useGun().user().is
     },
   },
   actions: {

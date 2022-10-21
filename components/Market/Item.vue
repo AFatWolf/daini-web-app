@@ -22,17 +22,53 @@
         </div>
       </div>
 
-      <div class="btn btn-primary text-white">{{ $t('common.purchase') }}</div>
+      <div role="button" class="btn btn-primary text-white" @click="onPurchase">
+        {{ $t('common.purchase') }}
+      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { useTransactionStore } from '@/stores/transaction'
+import { IOrder } from '@/interfaces/transaction'
+
 export default {
   props: {
     item: {
       type: Object,
       default: () => ({}),
+    },
+  },
+  setup(props) {
+    const productSoul = getGunNodeSoul(props.item)
+    const transactionStore = useTransactionStore()
+    const { t } = useLang()
+
+    return {
+      t,
+      productSoul,
+      transactionStore,
+    }
+  },
+  methods: {
+    async onPurchase() {
+      const { t, transactionStore, item, productSoul } = this
+      const quantity = 1 // TODO: fix this
+      const order: IOrder = {
+        name: item.name,
+        soul: productSoul,
+        quantity: quantity, 
+        price: item.price * quantity,
+        sellerAlias: item.sellerAlias
+      }
+
+      const { data, err } = await transactionStore.buy(order)
+      if(err) {
+        console.error(t(err))
+        return
+      } 
+      console.log(data)
     },
   },
 }

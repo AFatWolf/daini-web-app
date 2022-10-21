@@ -31,5 +31,9 @@ export const useMarketStore = defineStore('market', {
           this.products.push(data)
         })
     },
+    fetchProductWithSoul(soul) {
+      const gun = useGun()
+      gun.get(soul).get('items')
+    }
   },
 })

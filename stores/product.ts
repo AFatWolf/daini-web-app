@@ -1,16 +1,17 @@
 import { defineStore } from 'pinia'
 import { IProduct, IItem } from '@/interfaces/product'
-import { WAREHOUSE_KEY } from '~~/constants/common'
+import { WAREHOUSE_KEY } from '@/constants/common'
 import { ec as EC } from 'elliptic'
 import { useAuthStore } from '@/stores/auth'
-import { ITEM_STATUS } from '~~/constants/product'
+import { ITEM_STATUS } from '@/constants/product'
+import { useGun } from '@gun-vue/composables'
 
 const ec = new EC('secp256k1')
 
 interface IProductState {
   product: IProduct
   loading: {
-    getProduct: boolean
+    fetchProduct: boolean
     sellProduct: boolean
   }
 }
@@ -19,25 +20,24 @@ export const useProductStore = defineStore('item-stock', {
   state: (): IProductState => ({
     product: { items: [] },
     loading: {
-      getProduct: false,
+      fetchProduct: false,
       sellProduct: false,
     },
   }),
-  getters: {
-    getItemsList: (state) => {
-      return state.product.items || []
-    },
-  },
   actions: {
-    getProduct(id: string) {
-      const gun = useGunDb()
-      this.loading.getProduct = true
-      gun
-        .get(WAREHOUSE_KEY)
-        .get(id)
-        .on((data) => {
-          this.loading.getProduct = false
-        })
+    async fetchProductBySoul(soul: string) {
+      const gun = useGun()
+      this.loading.fetchProduct = true
+
+      const productRef = gun.get(soul)
+      const product = await useOnceToPromise(productRef)
+      if (!product) {
+        return { err: 'error.no_product' }
+      }
+      this.product = product
+      this.loading.fetchProduct = false
+
+      return { data: product }
     },
     sellProduct(product: IProduct) {
       const gun = useGunDb()
@@ -51,10 +51,12 @@ export const useProductStore = defineStore('item-stock', {
       product.createdTime = new Date().toISOString()
       product.totalQuantity = Number(product.totalQuantity)
       product.leftQuantity = product.totalQuantity
+      product.sellerAlias = authStore.getUsername
       const putProduct = {
         [product.id]: product,
       }
 
+      // TODO-REMOVE
       // Generate key pairs for each items
       const generateKeys = (callback?: () => {}) => {
         for (let i = 0; i < product.totalQuantity; i++) {
@@ -70,7 +72,7 @@ export const useProductStore = defineStore('item-stock', {
 
       const linkProductToOwner = () => {
         const productRef = gun.get(WAREHOUSE_KEY).get(product.id)
-
+        debugger
         // Link product Reference to user
         userRef.get(WAREHOUSE_KEY).set(productRef, (ack) => {
           if (ack.error) {
@@ -82,11 +84,12 @@ export const useProductStore = defineStore('item-stock', {
       }
 
       this.loading.sellProduct = true
+      // TODO: Error checking 
       gun.get(WAREHOUSE_KEY).put(putProduct, (ack) => {
         if (ack.err) {
           console.log(ack)
         } else {
-          generateKeys()
+          // generateKeys()
           const soul = ack['#']
           console.log('Ack: ', ack)
           linkProductToOwner()

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ILogInParams, ISignUpParams } from '@/interfaces/auth'
 import { useGun } from '@gun-vue/composables'
+import { USERS_KEY } from '@/constants/common'
 
 interface IAuthState {
   // TODO: replace with IUser
@@ -30,6 +31,9 @@ export const useAuthStore = defineStore('auth', {
     },
     getUsername() { // get Alias
       return useGun().user().is?.alias || 'anon'
+    },
+    getAlias(state) {
+      return state.userInfo ? useTrimStart(state.userInfo.soul, '~') : this.getUsername() 
     },
     getUserRef: (state) => state.userRef || null,
     isLoggedIn: () => {
@@ -61,7 +65,6 @@ export const useAuthStore = defineStore('auth', {
       const onLogin = (ack) => {
         this.loading.userInfo = false
         this.userInfo = ack
-        this.userInfo.username = body.username
         console.log(ack)
         console.log('userinfo', this.userInfo)
       }
@@ -74,6 +77,14 @@ export const useAuthStore = defineStore('auth', {
     },
     fetchUserRef() {
       this.userRef = this.userInfo['$']
+    },
+    fetchPublicCurrentUserRef() {
+      const alias = this.getAlias
+      return this.fetchPublicUserRef(alias)
+    },
+    fetchPublicUserRef(alias: string) {
+      const appGun = useGunDb()
+      return appGun.get(USERS_KEY).get(alias)
     },
     logOut() {
       useGun().user.leave()

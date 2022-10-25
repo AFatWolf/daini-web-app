@@ -42,7 +42,7 @@ export const useProductStore = defineStore('item-stock', {
     sellProduct(product: IProduct) {
       const gun = useGunDb()
       const authStore = useAuthStore()
-      const userRef = authStore.getUserRef
+      const userRef = authStore.fetchPublicCurrentUserRef(WAREHOUSE_KEY)
 
       if (!userRef) return
 
@@ -51,30 +51,16 @@ export const useProductStore = defineStore('item-stock', {
       product.createdTime = new Date().toISOString()
       product.totalQuantity = Number(product.totalQuantity)
       product.leftQuantity = product.totalQuantity
-      product.sellerAlias = authStore.getUsername
+      product.sellerAlias = authStore.getAlias
       const putProduct = {
         [product.id]: product,
-      }
-
-      // TODO-REMOVE
-      // Generate key pairs for each items
-      const generateKeys = (callback?: () => {}) => {
-        for (let i = 0; i < product.totalQuantity; i++) {
-          const keyPair = ec.genKeyPair()
-          const item = {
-            status: ITEM_STATUS.AVAILABLE,
-            keyPairJSON: JSON.stringify(keyPair),
-          }
-          gun.get(WAREHOUSE_KEY).get(product.id).get('items').set(item)
-          if (callback) callback()
-        }
       }
 
       const linkProductToOwner = () => {
         const productRef = gun.get(WAREHOUSE_KEY).get(product.id)
         debugger
         // Link product Reference to user
-        userRef.get(WAREHOUSE_KEY).set(productRef, (ack) => {
+        userRef.set(productRef, (ack) => {
           if (ack.error) {
             console.log('Cannot put item in owner.', ack)
           } else {
@@ -89,9 +75,6 @@ export const useProductStore = defineStore('item-stock', {
         if (ack.err) {
           console.log(ack)
         } else {
-          // generateKeys()
-          const soul = ack['#']
-          console.log('Ack: ', ack)
           linkProductToOwner()
           console.log('Sell successfully')
         }

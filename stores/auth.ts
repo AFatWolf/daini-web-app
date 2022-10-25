@@ -78,13 +78,14 @@ export const useAuthStore = defineStore('auth', {
     fetchUserRef() {
       this.userRef = this.userInfo['$']
     },
-    fetchPublicCurrentUserRef() {
+    fetchPublicCurrentUserRef(key: string = '') {
       const alias = this.getAlias
-      return this.fetchPublicUserRef(alias)
+      return this.fetchPublicUserRef(alias, key)
     },
-    fetchPublicUserRef(alias: string) {
+    fetchPublicUserRef(alias: string, key: string = '') {
       const appGun = useGunDb()
-      return appGun.get(USERS_KEY).get(alias)
+      if(!key) return appGun.get(USERS_KEY).get(alias)
+      return appGun.get(USERS_KEY).get(key + '-' + alias)
     },
     logOut() {
       useGun().user.leave()

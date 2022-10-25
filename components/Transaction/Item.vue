@@ -3,6 +3,10 @@
     <div class="fs-5 fw-bold text-dark">
       {{ item.product?.name }}
     </div>
+    <div class="fs-6 text-dark">Soul:&nbsp{{ soul }}</div>
+    <div class="fs-6 text-dark">
+      {{ $t('transaction.state') }}:&nbsp{{ item.state }}
+    </div>
     <div class="fs-6 text-dark">
       {{ $t('common.price') }}:&nbsp{{ item.product?.price }}
     </div>
@@ -14,12 +18,72 @@
       <div>{{ $t('transaction.role') }}:&nbsp</div>
       <div v-if="role === TRANSACTION_SIDE.BUYER">
         {{ $t('transaction.buyer') }}
+        <div v-if="item.state === TRANSACTION_STATE.DONE_ACCEPT_TO_SELL">
+          <div role="button" class="btn btn-success" @click="pay">
+            {{ $t('transaction.button.pay') }}
+          </div>
+          <div role="button" class="btn btn-danger">
+            {{ $t('transaction.button.stop') }}
+          </div>
+        </div>
+        <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
+          <div role="button" class="btn btn-success" @click="dispute">
+            {{ $t('transaction.button.dispute') }}
+          </div>
+        </div>
+        <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER">
+          <div
+            role="button"
+            class="btn btn-success"
+            @click="getMoney(TRANSACTION_SIDE.BUYER)"
+          >
+            {{ $t('transaction.button.get_money_back') }}
+          </div>
+        </div>
       </div>
       <div v-else-if="role === TRANSACTION_SIDE.SELLER">
         {{ $t('transaction.seller') }}
+        <div v-if="item.state === TRANSACTION_STATE.DONE_BUY">
+          <div role="button" class="btn btn-success" @click="acceptToSell">
+            {{ $t('transaction.button.accept_to_sell') }}
+          </div>
+          <div role="button" class="btn btn-danger">
+            {{ $t('transaction.button.refuse_to_sell') }}
+          </div>
+        </div>
+        <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
+          <div role="button" class="btn btn-success" @click="dispute">
+            {{ $t('transaction.button.dispute') }}
+          </div>
+        </div>
+        <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER && item.winnerAlias == authStore.getAlias">
+          <div
+            role="button"
+            class="btn btn-success"
+            @click="getMoney(TRANSACTION_SIDE.SELLER)"
+          >
+            {{ $t('transaction.button.get_money') }}
+          </div>
+        </div>
       </div>
       <div v-else-if="role === TRANSACTION_SIDE.MEDITATOR">
         {{ $t('transaction.meditator') }}
+        <div v-if="item.state === TRANSACTION_STATE.DONE_DISPUTE">
+          <div
+            role="button"
+            class="btn btn-success"
+            @click="setWinner(TRANSACTION_SIDE.BUYER)"
+          >
+            {{ $t('transaction.button.buyer_wins') }}
+          </div>
+          <div
+            role="button"
+            class="btn btn-danger"
+            @click="setWinner(TRANSACTION_SIDE.SELLER)"
+          >
+            {{ $t('transaction.button.seller_wins') }}
+          </div>
+        </div>
       </div>
       <div v-else>{{ $t('common.error.something_is_wrong') }}</div>
     </div>
@@ -28,7 +92,11 @@
 
 <script lang="ts">
 import { useTransactionStore } from '@/stores/transaction'
-import { TRANSACTION_SIDE } from '@/constants/transaction'
+import {
+  TRANSACTION_STATE,
+  TRANSACTION_SIDE,
+  TRANSACTION_FIELDS,
+} from '@/constants/transaction'
 import { useAuthStore } from '@/stores/auth'
 
 export default {
@@ -47,6 +115,7 @@ export default {
     return {
       soul,
       TRANSACTION_SIDE,
+      TRANSACTION_STATE,
       transactionStore,
       authStore,
     }
@@ -54,7 +123,7 @@ export default {
   computed: {
     role() {
       const { item } = this
-      const alias = this.authStore.getUsername
+      const alias = this.authStore.getAlias
       if (item.buyer?.alias && item.buyer.alias === alias)
         return TRANSACTION_SIDE.BUYER
       if (item.seller?.alias && item.seller.alias === alias)
@@ -68,6 +137,23 @@ export default {
     return {
       to: '',
     }
+  },
+  methods: {
+    acceptToSell() {
+      this.transactionStore.acceptToSell(this.soul)
+    },
+    pay() {
+      this.transactionStore.pay(this.soul)
+    },
+    dispute() {
+      this.transactionStore.dispute(this.soul)
+    },
+    setWinner(winner: TRANSACTION_SIDE) {
+      this.transactionStore.setWinner(this.soul, winner)
+    },
+    getMoney(winner: TRANSACTION_SIDE) {
+      this.transactionStore.getMoney(this.soul, winner)
+    },
   },
 }
 </script>

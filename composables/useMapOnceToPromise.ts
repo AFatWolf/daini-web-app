@@ -13,6 +13,7 @@ export const useMapOnceToPromise = (gunRef) => {
     const onceRef = await useOnceToPromise(gunRef)
     if(onceRef.error) return reject({ err: 'error.execution' })
     gunRef.once().once((data) => {
+      console.log('Set data: ', data)
       if (!data) return reject({ err: 'error.no_data_returned' })
       if (!data || data.error) return reject({ err: 'error.execution' })
       // since onceRef will be duplicated here

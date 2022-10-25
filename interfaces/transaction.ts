@@ -29,4 +29,5 @@ export interface IOrder {
   quantity?: number
   price?: number
   sellerAlias: string
+  meditatorAlias: string
 }

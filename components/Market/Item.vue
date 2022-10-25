@@ -60,7 +60,8 @@ export default {
         soul: productSoul,
         quantity: quantity, 
         price: item.price * quantity,
-        sellerAlias: item.sellerAlias
+        sellerAlias: item.sellerAlias,
+        meditatorAlias: 'MTgzjtlGTz8d4EyOxeRbFw94A-9i09ZwmwG-uAOvgw0.1LVb2lzKP6GXuk2wdcL3cb4bA69IThblD-g0G4k8504' // TODO-REMOVE
       }
 
       const { data, err } = await transactionStore.buy(order)

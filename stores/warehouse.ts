@@ -40,25 +40,22 @@ export const useWarehouseStore = defineStore('warehouse', {
       if (!isEmpty(this.productsBySoul)) return
 
       const authStore = useAuthStore()
-      const userRef = authStore.getUserRef
+      const userRef = authStore.fetchPublicCurrentUserRef(WAREHOUSE_KEY)
       const gun = useGun()
 
       if (!userRef) return
 
-      userRef
-        .get(WAREHOUSE_KEY)
-        .map()
-        .on((data) => {
-          console.log('Warehouse:', data)
-          if (typeof data === 'object' && data) {
-            const soul = getProductGunSoul(data)
+      userRef.map().on((data) => {
+        console.log('Warehouse:', data)
+        if (typeof data === 'object' && data) {
+          const soul = getProductGunSoul(data)
 
-            if (!soul) return
+          if (!soul) return
 
-            this.souls.push(soul)
-            this.productsBySoul[soul] = data
-          }
-        })
+          this.souls.push(soul)
+          this.productsBySoul[soul] = data
+        }
+      })
     },
   },
 })

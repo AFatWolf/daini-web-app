@@ -81,7 +81,6 @@ export default {
       console.log('2: ', test)
     },
     async doThings3() {
-      debugger
       // const gun = useGun()
       // const data = gun
       //   .get('Kittykeys')
@@ -96,77 +95,32 @@ export default {
       // console.log('Test', test)
 
       const gun = useGunDb()
-      const id = 'Roomba'
-      // gun
-      //   .get(WAREHOUSE_KEY)
-      //   .map()
+      // const id = 'Roomba'
 
-      //   .once((data) => {
-      //     console.log('Product:', data)
-      //     console.log(data.price)
-      //   })
-      // useGunDb()
-      //   .get(WAREHOUSE_KEY)
-      //   .get('Rope')
-      //   .once((data) => {
-      //     console.log('Data', data)
-      //   })
-      
-      // const ropeNode = useGunDb().get(WAREHOUSE_KEY).get('Rope')
-      // const promise_data = await useOnceToPromise(ropeNode, ropeNode)
-      // console.log('Promise data 1:', promise_data)
-      // ropeNode.once((data) => {
-      //   console.log('Data', data)
-      // })
-      // // https://stackoverflow.com/questions/27232157/pass-class-function-as-parameter-to-another-class-to-use-as-callback-in-javascri
-      // const promise_data_2 = await new Promise((resolve, reject) => {
-      //   useGunDb()
-      //     .get(WAREHOUSE_KEY)
-      //     .get('Rope')
-      //     .once((data) => {
-      //       if (!data) return reject({ error: 'No data returned' })
-      //       if (!data || data.error) return reject(data)
-      //       resolve(data)
-      //     })
-      // })
-      // console.log('Promise data 2: ', promise_data_2)
+      // const data2 = await useOnceToPromise(
+      //   useGun()
+      //     .get('test-25122000/transactions/["04189a2bd70ad75eab8e0ad86...')
+      //     .get('seller')
+      // )
+      // console.log('Get just sold data: ', data2)
 
-      // useGun().get('test-25122000/warehouse/betsuyon/items')
-      // const warehouse = useGun()
-      //   .user('hiKtty2')
-      //   .get(WAREHOUSE_KEY)
-      //   .map()
-      //   .once((data) => {
-      //     console.log('77 Product:', data)
-      //   })
-
-
-      useGun()
-        .user('hiKitty2')
-        .get('sea')
-        .once((data) => {
-          console.log('Test user data: ', data)
-        })
-      const name = this.str || 'hiKitty2'
       const authStore = useAuthStore()
+      const sea = authStore.userInfo.sea
 
-      // const data = await useSetToPromise(authStore.getUserRef.get(TRANSACTIONS_KEY), {hello: 'hi'})
-      const ack = await useMapOnceToPromise(authStore.getUserRef.get(TRANSACTIONS_KEY))
-      const onceRef = await useOnceToPromise(authStore.getUserRef.get(TRANSACTIONS_KEY))
-      console.log('onceRef: ', onceRef)
-      useGun().get(onceRef['_']['#']).once((data) => {
-        console.log('map data', data)
-      })
+      const en = await SEA.encrypt('hello world', sea)
+      const en2 = await SEA.encrypt(en, sea)
+      const enstring = "SEA{\"ct\":\"vCg6SE5UalyWZ/1CAKJV9xIhYKSoRp6bamwQyWAWPT8V6l98012/v+dTjIPN8YMVJLSV0a7xJvLJVRHCxNdkGfH3QcIZ3N8j2OZNqkIifyHy1HAFS+hwvBGEd97R+KkUb3i39Q8rhtUvYp8jvuVq\",\"iv\":\"zuTsrphtDhbC+awzewVf\",\"s\":\"cvC1DcQEPkQJ\"}"
+      const de = await SEA.decrypt('SEA{"ct":"NyEkvG4ucYbSAdsALwMdqs3k74arq0knCHDA","iv":"qghPnkVk5qTsVQQLQEEz","s":"o9zKtdp/yEiI"} ', sea)
+      const de2 = await SEA.decrypt(enstring, sea)
+      const de2String = JSON.stringify(de2)
+      const de3 = await SEA.decrypt(de2String, sea)
+      debugger
 
-      console.log("User Transaction: ", ack)
-      // useGun().users.once().map().once((data) => {
-      //   console.log('User: ', data)
-      // })
-      // console.log(await SEA.pair())
-      // console.log('Warehouse', warehouse)
-      const alias = 'pLgVmRcmm1G6a2bLy107lpiqV9QXxNp8zc2PTztuXvk.p58mPLRaEFhEugIek9IO4bCTRglcAJ7SM6SU0Ru5mxU'
-      const user = getUserRefByAlias(alias)
-      console.log('Get user lias: '. user)
+      console.log('Decrypted message: ', en, en2, de, de2, de3)
+
+      const bcaddress = '0427c2d21385a074d903c246e4f30659e93772b84e359fee242866d25872d0ff44bd2770c0f08d13677f0cf0d2cc4056f7a5a58db819307180633b262a278bf2ce'
+      const bcpriv = '47705e25bfb31a042b40801e891e1f1603d1b34c81fedcaf739f12891e9cd19e'
+      
     },
   },
 }

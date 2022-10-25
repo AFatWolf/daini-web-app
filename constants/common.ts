@@ -4,7 +4,7 @@ export const WAREHOUSE_KEY = 'warehouse'
 
 export const TRANSACTIONS_KEY = 'transactions'
 
-export const USERS_KEY = 'users'
+export const USERS_KEY = 'daini-users'
 
 export const WAREHOUSE_ROUTE = {
     DETAIL: 'warehouse-productSoul'

@@ -9,9 +9,11 @@ import { useGun, SEA } from '@gun-vue/composables'
 import { ec as EC } from 'elliptic'
 import { useAuthStore } from './auth'
 import { TRANSACTIONS_KEY } from '@/constants/common'
-import { IReturn } from '@/interfaces/common'
+import Web3 from 'web3'
+import { GAS_FEE, GAS_PRICE } from '@/constants/transaction'
 
 const ec = new EC('secp256k1')
+const web3 = new Web3(Web3.givenProvider || 'http://127.0.0.1:7545')
 
 interface ITransactionState {
   transactions: ITransaction[]
@@ -54,7 +56,7 @@ export const useTransactionStore = defineStore('transaction', {
       const authStore = useAuthStore()
       const userTransactionsRef =
         authStore.fetchPublicCurrentUserRef(TRANSACTIONS_KEY)
-      debugger
+
       if (!authStore.isLoggedIn || !userTransactionsRef) {
         return { err: 'error.not_logged_in' }
       }
@@ -171,7 +173,7 @@ export const useTransactionStore = defineStore('transaction', {
           name: productName,
           soul: productSoul,
           quantity: quantity,
-          price,
+          price: price * quantity, // in Yen
         },
         state: TRANSACTION_STATE.DONE_BUY,
       }
@@ -275,9 +277,10 @@ export const useTransactionStore = defineStore('transaction', {
       )
       // Calculate secret place to transfer money: Q_abc = Qbc + Qa
       // Then encode it to String
-      const BCAddress = sellerSharedSecretPubKey
+      const BCPublicKey = sellerSharedSecretPubKey
         .add(buyerKeyPair.getPublic())
         .encode('hex')
+      const BCAddress = getBCAddress(BCPublicKey)
       const encryptedBCAddress = await SEA.encrypt(BCAddress, sellerSeaPair)
       console.log('(acceptToSell) BC address: ', BCAddress)
       // Encrypt B's priv key with shared passphrase of B and A using SEA.secret
@@ -328,16 +331,18 @@ export const useTransactionStore = defineStore('transaction', {
         buyer: buyerLink,
         seller: sellerLink,
         meditator: meditatorLink,
+        product: productLink
       } = await useOnceToPromise(transactionRef)
 
       const buyerSoul = getGunNodeSoul(buyerLink)
       const sellerSoul = getGunNodeSoul(sellerLink)
       const meditatorSoul = getGunNodeSoul(meditatorLink)
+      const productSoul = getGunNodeSoul(productLink)
       const buyer = await useOnceToPromise(gun.get(buyerSoul))
       const seller = await useOnceToPromise(gun.get(sellerSoul))
       const meditator = await useOnceToPromise(gun.get(meditatorSoul))
-      debugger
-      if (!seller.alias || !meditator.alias) {
+      const product = await useOnceToPromise(gun.get(productSoul))
+      if (!seller.alias || !meditator.alias || !product.price) {
         return { err: 'error.cant_proceed_this_transaction' }
       }
 
@@ -363,11 +368,15 @@ export const useTransactionStore = defineStore('transaction', {
       )
       // Calculate secret place to transfer money: Q_abc = Qac + Qb
       // Then encode it to String
-      const BCAddress = buyerSharedSecretPubKey
+      const BCAddressPublicKey = buyerSharedSecretPubKey
         .add(sellerKeyPair.getPublic())
         .encode('hex')
+      const BCAddress = getBCAddress(BCAddressPublicKey)
       // TODO-REMOVE
       console.log('(Pay) BC address: ', BCAddress)
+      const priceInWei = getExchangeYenToWei(product.price) + GAS_FEE * GAS_PRICE
+      makeTransaction(BCAddress, priceInWei)
+
       const encryptedBCAddress = await SEA.encrypt(BCAddress, buyerSeaPair)
 
       // Send money to the Address
@@ -500,6 +509,7 @@ export const useTransactionStore = defineStore('transaction', {
         buyer: buyerLink,
         seller: sellerLink,
         meditator: meditatorLink,
+        product: productLink,
         BCEpriv: encryptedBCEpriv,
       } = await useOnceToPromise(transactionRef)
 
@@ -513,17 +523,43 @@ export const useTransactionStore = defineStore('transaction', {
       }
       const winnerSoul = getGunNodeSoul(winnerLink)
       const loserSoul = getGunNodeSoul(loserLink)
+      const productSoul = getGunNodeSoul(productLink)
       const winner = await useOnceToPromise(gun.get(winnerSoul))
       const loser = await useOnceToPromise(gun.get(loserSoul))
+      const product = await useOnceToPromise(gun.get(productSoul))
+      
       if (!loser.alias || winner.alias != authStore.getAlias) {
         return { err: 'error.cant_proceed_this_transaction' }
       }
       const winnerSeaPair = authStore.userInfo.sea
 
+      const winnerKeyPair = await parseTransactionKeyPair(winner, winnerSeaPair)
+      const loserKeyPair = await parseTransactionKeyPair(loser)
+
       const sharedPassphrase = await getSharedSecretPassphrase(loser.alias)
-      const BCEpriv = await SEA.decrypt(encryptedBCEpriv, sharedPassphrase)
-      const BCAddress = await SEA.decrypt(winner.BCAddress, winnerSeaPair)
+      const loserPrivString = await SEA.decrypt(
+        encryptedBCEpriv,
+        sharedPassphrase
+      )
+      const loserPriv = ec.keyFromPrivate(loserPrivString)
+      const sharedSecret = winnerKeyPair.derive(loserKeyPair.getPublic()) // d_c
+      const BCEprivString = winnerKeyPair
+        .getPrivate()
+        .add(sharedSecret)
+        .add(loserPriv.getPrivate()) //d_b + d_c + d_a
+      const BCPair = ec.keyFromPrivate(BCEprivString)
+      const BCEpriv = BCPair.getPrivate().toString(16)
+      const BCEPub = BCPair.getPublic().encode('hex') // remove 04 prefix
+      const BCAddress = getBCAddress(BCEPub)
+      const BCAddress2 = await SEA.decrypt(winner.BCAddress, winnerSeaPair)
+      
+      const accounts = await web3.eth.requestAccounts()
+      const account = accounts[0]
+      const amount = getExchangeYenToWei(product.price) 
+      debugger
+      makeSignedTransaction(account, BCEpriv, amount)
       console.log('BCAddress: ', BCAddress)
+      console.log('BC2Address: ', getBCAddress(BCAddress2))
       console.log('BC private key: ', BCEpriv)
     },
     /* Called when user want to cancel the transaction. Can depend on the state of transaction */

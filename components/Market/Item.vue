@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card w-100">
     <!-- <Anchor :to=""> </Anchor> -->
     <!-- <img class="card-img-top" src="..." alt="Card image cap" /> -->
     <div class="card-body">
@@ -9,7 +9,7 @@
       </div>
       <div class="d-flex flex-row">
         <div class="fs-7 flex-grow-1 text-dark">
-          {{ item.price }}
+          {{$t('item.price')}}:&nbsp{{ item.price }}
         </div>
         <div
           v-if="item.leftQuantity || item.leftQuantity === 0"
@@ -54,7 +54,7 @@ export default {
   methods: {
     async onPurchase() {
       const { t, transactionStore, item, productSoul } = this
-      const quantity = 1 // TODO: fix this
+      const quantity = 1 // TODO-REFACTOR: fix this
       const order: IOrder = {
         name: item.name,
         soul: productSoul,

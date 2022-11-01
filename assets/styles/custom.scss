@@ -5,8 +5,11 @@
 
 $primary: #ec7a5c;
 
-$theme-colors: (
-  'primary': $primary,
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    'primary': $primary,
+  )
 );
 
 $font-sizes: map-merge(

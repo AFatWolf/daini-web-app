@@ -29,6 +29,9 @@ export default {
     title: 'Transactions',
     role: 'Role',
     buyer: 'Buyer',
+    buyer_order: 'Your Orders',
+    seller_order: 'Your Customers\' Orders',
+    meditator_order: 'Your Managing Transactions',
     seller: 'Seller',
     meditator: 'Meditator',
     button: {

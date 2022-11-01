@@ -1,14 +1,16 @@
 <template>
-  <div class="container row">
-    <div class="col-7">
-      <div class="d-flex flex-column align-content-center">
-        <div class="fs-64">{{ $t('tag_line_1') }}</div>
-        <div class="fs-64">{{ $t('tag_line_2') }}</div>
-        <TagImage />
+  <div class="container">
+    <div class="row">
+      <div class="col-7">
+        <div class="d-flex flex-column align-content-center">
+          <div class="fs-64">{{ $t('tag_line_1') }}</div>
+          <div class="fs-64">{{ $t('tag_line_2') }}</div>
+          <TagImage />
+        </div>
       </div>
-    </div>
-    <div class="col-5">
-      <SignUpForm v-model="form" />
+      <div class="d-flex flex-column justify-content-center col-5">
+        <SignUpForm v-model="form" />
+      </div>
     </div>
   </div>
 </template>

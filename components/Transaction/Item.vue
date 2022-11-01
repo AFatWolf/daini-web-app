@@ -1,91 +1,127 @@
 <template>
-  <div class="d-flex flex-column border border-3">
-    <div class="fs-5 fw-bold text-dark">
-      {{ item.product?.name }}
-    </div>
-    <div class="fs-6 text-dark">Soul:&nbsp{{ soul }}</div>
-    <div class="fs-6 text-dark">
-      {{ $t('transaction.state') }}:&nbsp{{ item.state }}
-    </div>
-    <div class="fs-6 text-dark">
-      {{ $t('common.price') }}:&nbsp{{ item.product?.price }}
-    </div>
-    <div class="fs-6 text-dark">
-      {{ $t('common.quantity') }}:&nbsp{{ item.product?.quantity }}
-    </div>
-
-    <div class="d-flex flex-row">
-      <div>{{ $t('transaction.role') }}:&nbsp</div>
-      <div v-if="role === TRANSACTION_SIDE.BUYER">
-        {{ $t('transaction.buyer') }}
-        <div v-if="item.state === TRANSACTION_STATE.DONE_ACCEPT_TO_SELL">
-          <div role="button" class="btn btn-success" @click="pay">
-            {{ $t('transaction.button.pay') }}
-          </div>
-          <div role="button" class="btn btn-danger">
-            {{ $t('transaction.button.stop') }}
-          </div>
+  <div
+    v-if="role != 'anon'"
+    class="
+      d-flex
+      flex-column
+      container
+      border border-2 border-primary
+      rounded rounded-2
+      py-2
+      px-3
+    "
+  >
+    <div class="row">
+      <div class="d-flex flex-column col-sm-9 col-12">
+        <div class="fs-4 fw-bold text-dark">
+          {{ item.product?.name }}
         </div>
-        <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
-          <div role="button" class="btn btn-success" @click="dispute">
-            {{ $t('transaction.button.dispute') }}
-          </div>
+        <div class="fs-6 text-dark">
+          {{ $t('transaction.state') }}:&nbsp{{ item.state }}
         </div>
-        <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER">
-          <div
-            role="button"
-            class="btn btn-success"
-            @click="getMoney(TRANSACTION_SIDE.BUYER)"
-          >
-            {{ $t('transaction.button.get_money_back') }}
-          </div>
+        <div class="fs-6 text-dark">
+          {{ $t('common.price') }}:&nbsp{{ item.product?.price }}
+        </div>
+        <div class="fs-6 text-dark">
+          {{ $t('common.quantity') }}:&nbsp{{ item.product?.quantity }}
         </div>
       </div>
-      <div v-else-if="role === TRANSACTION_SIDE.SELLER">
-        {{ $t('transaction.seller') }}
-        <div v-if="item.state === TRANSACTION_STATE.DONE_BUY">
-          <div role="button" class="btn btn-success" @click="acceptToSell">
-            {{ $t('transaction.button.accept_to_sell') }}
+      <div class="d-flex flex-column my-auto col-sm-3 col-12 fs-7">
+        <!-- <div>{{ $t('transaction.role') }}:&nbsp</div> -->
+        <div v-if="role === TRANSACTION_SIDE.BUYER">
+          <!-- {{ $t('transaction.buyer') }} -->
+          <div v-if="item.state === TRANSACTION_STATE.DONE_ACCEPT_TO_SELL">
+            <div class="d-flex flex-column">
+              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="pay">
+                {{ $t('transaction.button.pay') }}
+              </div>
+              <div role="button" class="mb-1 rounded rounded-pill btn btn-danger">
+                {{ $t('transaction.button.stop') }}
+              </div>
+            </div>
           </div>
-          <div role="button" class="btn btn-danger">
-            {{ $t('transaction.button.refuse_to_sell') }}
+          <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
+            <div class="d-flex flex-column">
+              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="dispute">
+                {{ $t('transaction.button.dispute') }}
+              </div>
+            </div>
+          </div>
+          <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER">
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="getMoney(TRANSACTION_SIDE.BUYER)"
+              >
+                {{ $t('transaction.button.get_money_back') }}
+              </div>
+            </div>
           </div>
         </div>
-        <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
-          <div role="button" class="btn btn-success" @click="dispute">
-            {{ $t('transaction.button.dispute') }}
+        <div v-else-if="role === TRANSACTION_SIDE.SELLER">
+          <!-- {{ $t('transaction.seller') }} -->
+          <div v-if="item.state === TRANSACTION_STATE.DONE_BUY">
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="acceptToSell"
+              >
+                {{ $t('transaction.button.accept_to_sell') }}
+              </div>
+              <div role="button" class="mb-1 rounded rounded-pill btn btn-danger">
+                {{ $t('transaction.button.refuse_to_sell') }}
+              </div>
+            </div>
           </div>
-        </div>
-        <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER && item.winnerAlias == authStore.getAlias">
+          <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
+            <div class="d-flex flex-column">
+              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="dispute">
+                {{ $t('transaction.button.dispute') }}
+              </div>
+            </div>
+          </div>
           <div
-            role="button"
-            class="btn btn-success"
-            @click="getMoney(TRANSACTION_SIDE.SELLER)"
+            v-if="
+              item.state === TRANSACTION_STATE.DONE_SET_WINNER &&
+              item.winnerAlias == authStore.getAlias
+            "
           >
-            {{ $t('transaction.button.get_money') }}
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="getMoney(TRANSACTION_SIDE.SELLER)"
+              >
+                {{ $t('transaction.button.get_money') }}
+              </div>
+            </div>
           </div>
         </div>
+        <div v-else-if="role === TRANSACTION_SIDE.MEDITATOR">
+          <!-- {{ $t('transaction.meditator') }} -->
+          <div v-if="item.state === TRANSACTION_STATE.DONE_DISPUTE">
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="setWinner(TRANSACTION_SIDE.BUYER)"
+              >
+                {{ $t('transaction.button.buyer_wins') }}
+              </div>
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
+                @click="setWinner(TRANSACTION_SIDE.SELLER)"
+              >
+                {{ $t('transaction.button.seller_wins') }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else>{{ $t('common.error.something_is_wrong') }}</div>
       </div>
-      <div v-else-if="role === TRANSACTION_SIDE.MEDITATOR">
-        {{ $t('transaction.meditator') }}
-        <div v-if="item.state === TRANSACTION_STATE.DONE_DISPUTE">
-          <div
-            role="button"
-            class="btn btn-success"
-            @click="setWinner(TRANSACTION_SIDE.BUYER)"
-          >
-            {{ $t('transaction.button.buyer_wins') }}
-          </div>
-          <div
-            role="button"
-            class="btn btn-danger"
-            @click="setWinner(TRANSACTION_SIDE.SELLER)"
-          >
-            {{ $t('transaction.button.seller_wins') }}
-          </div>
-        </div>
-      </div>
-      <div v-else>{{ $t('common.error.something_is_wrong') }}</div>
     </div>
   </div>
 </template>

@@ -38,6 +38,9 @@
 import { useGun, SEA } from '@gun-vue/composables'
 import { WAREHOUSE_KEY, TRANSACTIONS_KEY } from '~~/constants/common'
 import { useAuthStore } from '~~/stores/auth'
+import Web3 from 'web3'
+import { ec as EC } from 'elliptic'
+import { keccak256 } from 'js-sha3'
 
 export default {
   setup() {
@@ -109,18 +112,75 @@ export default {
 
       const en = await SEA.encrypt('hello world', sea)
       const en2 = await SEA.encrypt(en, sea)
-      const enstring = "SEA{\"ct\":\"vCg6SE5UalyWZ/1CAKJV9xIhYKSoRp6bamwQyWAWPT8V6l98012/v+dTjIPN8YMVJLSV0a7xJvLJVRHCxNdkGfH3QcIZ3N8j2OZNqkIifyHy1HAFS+hwvBGEd97R+KkUb3i39Q8rhtUvYp8jvuVq\",\"iv\":\"zuTsrphtDhbC+awzewVf\",\"s\":\"cvC1DcQEPkQJ\"}"
-      const de = await SEA.decrypt('SEA{"ct":"NyEkvG4ucYbSAdsALwMdqs3k74arq0knCHDA","iv":"qghPnkVk5qTsVQQLQEEz","s":"o9zKtdp/yEiI"} ', sea)
+      const enstring =
+        'SEA{"ct":"vCg6SE5UalyWZ/1CAKJV9xIhYKSoRp6bamwQyWAWPT8V6l98012/v+dTjIPN8YMVJLSV0a7xJvLJVRHCxNdkGfH3QcIZ3N8j2OZNqkIifyHy1HAFS+hwvBGEd97R+KkUb3i39Q8rhtUvYp8jvuVq","iv":"zuTsrphtDhbC+awzewVf","s":"cvC1DcQEPkQJ"}'
+      const de = await SEA.decrypt(
+        'SEA{"ct":"NyEkvG4ucYbSAdsALwMdqs3k74arq0knCHDA","iv":"qghPnkVk5qTsVQQLQEEz","s":"o9zKtdp/yEiI"} ',
+        sea
+      )
       const de2 = await SEA.decrypt(enstring, sea)
       const de2String = JSON.stringify(de2)
       const de3 = await SEA.decrypt(de2String, sea)
-      debugger
 
       console.log('Decrypted message: ', en, en2, de, de2, de3)
 
-      const bcaddress = '0427c2d21385a074d903c246e4f30659e93772b84e359fee242866d25872d0ff44bd2770c0f08d13677f0cf0d2cc4056f7a5a58db819307180633b262a278bf2ce'
-      const bcpriv = '47705e25bfb31a042b40801e891e1f1603d1b34c81fedcaf739f12891e9cd19e'
-      
+      const ec = new EC('secp256k1')
+
+      const bcaddress =
+        '04e0f75153ee523a1341f5add06a615a95bd2761dc5c967a1732a35f1bc5ef1cf1aeacb302d6b9cc34effd9a3f4f531745e670731f36fa7904b0edafc02f706d5c'
+      const bcpriv =
+        '690b1d9d22ebbef5bc2193a0c98411b6504b843c7351863c8dc9cede61c1980f'
+      const publicKey = bcaddress.slice(2)
+      const TRANS_ADDRESS =
+        '0x' +
+        keccak256(Buffer.from(publicKey, 'hex'))
+          .slice(64 - 40)
+          .toString()
+      const test = ec.keyFromPrivate(bcpriv).getPublic().encode('hex')
+
+      const myaddress = '0x19b3a45E44Ee1089299f8ae3CE4c005582CD30CA'
+      const mypriv =
+        'ad3787e82ddf3e0f65277252ef7536a9fefdda725ae3ce6ead83ca54ff144c0b'
+
+      // const web3 = new Web3(Web3.givenProvider || 'http://127.0.0.1:7545')
+      // const nonce = await web3.eth.getTransactionCount(TRANS_ADDRESS, 'latest')
+      // const accounts = await web3.eth.requestAccounts()
+      // console.log(accounts)
+      // // console.log(web3.eth.accounts.privateKeyToAccount(accounts[0])) 
+      // console.log(
+      //   TRANS_ADDRESS,
+      //   web3.eth.accounts.privateKeyToAccount(bcpriv)
+      // )
+      // const transaction = {
+      //   to: myaddress,
+      //   value: 200000000000000000, // 2 ETH
+      //   gas: 21000,
+      //   nonce: nonce,
+      // }
+
+      // const signedTx = await web3.eth.accounts.signTransaction(
+      //   transaction,
+      //   bcpriv
+      // )
+      // web3.eth.sendSignedTransaction(
+      //   signedTx.rawTransaction,
+      //   function (error, hash) {
+      //     if (!error) {
+      //       console.log(
+      //         '🎉 The hash of your transaction is: ',
+      //         hash,
+      //         "\n Check Alchemy's Mempool to view the status of your transaction!"
+      //       )
+      //     } else {
+      //       console.log(
+      //         '❗Something went wrong while submitting your transaction:',
+      //         error
+      //       )
+      //     }
+      //   }
+      // )
+      makeSignedTransaction(myaddress, bcpriv, 200000000000000000)
+      makeTransaction(TRANS_ADDRESS, 300000000000000000)
     },
   },
 }

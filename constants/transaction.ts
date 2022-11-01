@@ -36,3 +36,7 @@ export enum TRANSACTION_FIELDS {
   SELLER_EPRIV = 'sellerEpriv',
   BLOCKCHAIN_PRIVATE_KEY = 'BCEpriv'
 }
+
+//  TODO-REFACTOR
+export const GAS_FEE = 21000
+export const GAS_PRICE = 20000000000

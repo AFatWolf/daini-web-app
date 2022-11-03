@@ -422,7 +422,7 @@ export const useTransactionStore = defineStore('transaction', {
           BCAddress: encryptedBCAddress,
         },
         [TRANSACTION_FIELDS.SELLER]: {
-          publicSharedSecret: encryptedBuyerSharedSecretPubKey,
+          publicSharedSecret: encryptedBuyerSharedSecretPubKey, // TODO-REMOVE
         },
         [TRANSACTION_FIELDS.MEDITATOR]: {
           buyerEpriv: encryptedBuyerPrivateKey,
@@ -440,13 +440,79 @@ export const useTransactionStore = defineStore('transaction', {
       return { data: putData, ok: 1 }
     },
     /* Called when seller has delivered the goods */
-    setDeliveredGoods() {},
+    async setDeliveredGoods(transactionSoul: string) {
+      const gun = useGun()
+      const appGun = useGunDb()
+      const authStore = useAuthStore()
+      if (!authStore.isLoggedIn || !authStore.userRef) {
+        return { err: 'error.not_logged_in' }
+      }
+
+      const putData = await usePutToPromise(gun.get(transactionSoul), {
+        state: TRANSACTION_STATE.DONE_SET_DELIVERED_GOODS,
+      })
+
+      if (putData.err) {
+        return { err: 'error.cant_set_delivered_this_transaction' }
+      }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_SET_DELIVERED_GOODS,
+      })
+      return { data: putData, ok: 1 }
+    },
     /* Called when buyer has received the goods */
-    setReceivedGoods() {
-      // Send Encrypted Y_B(X_A) to seller's B
+    async setReceivedGoods(transactionSoul: string) {
+      // Send Encrypted Buyer's Private Key Y_B(X_A) to seller's B
+      const gun = useGun()
+      const appGun = useGunDb()
+      const authStore = useAuthStore()
+      if (!authStore.isLoggedIn || !authStore.userRef) {
+        return { err: 'error.not_logged_in' }
+      }
+      const transactionRef = gun.get(transactionSoul)
+      const { buyer: buyerLink, seller: sellerLink } = await useOnceToPromise(
+        transactionRef
+      )
+
+      const buyerSoul = getGunNodeSoul(buyerLink)
+      const sellerSoul = getGunNodeSoul(sellerLink)
+      const buyer = await useOnceToPromise(gun.get(buyerSoul))
+      const seller = await useOnceToPromise(gun.get(sellerSoul))
+
+      if (!buyer.alias || !seller.alias) {
+        return { err: 'error.cant_proceed_this_transaction' }
+      }
+      // Get buyer A's public and private key
+      const buyerSeaPair = authStore.userInfo.sea
+      const buyerKeyPair = await parseTransactionKeyPair(buyer, buyerSeaPair)
+      const sharedPassphrase = await getSharedSecretPassphrase(seller.alias) // for exchanging information only
+      // Encrypt A's priv key da with AB's shared key Y_AB(X_A)
+      const { epriv: encBuyerPrivateKey } = await stringifyECKeyPair(
+        buyerKeyPair,
+        sharedPassphrase
+      )
+
+      const putData = await usePutToPromise(gun.get(transactionSoul), {
+        state: TRANSACTION_STATE.DONE_SET_RECEIVED_GOODS,
+        winnerAlias: seller.alias,
+        BCEpriv: encBuyerPrivateKey,
+      })
+
+      if (putData.err) {
+        return { err: 'error.cant_set_received_this_transaction' }
+      }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_SET_RECEIVED_GOODS,
+      })
+      return { data: putData, ok: 1 }
     },
     /* Called when seller has received the money */
-    setReceivedMoney() {},
+    async setReceivedMoney(transactionSoul: string) {
+      // Basically, the winner is seller, the loser is buyer
+      return await this.getMoney(transactionSoul, TRANSACTION_SIDE.SELLER) 
+    },
     async dispute(transactionSoul: string) {
       const gun = useGun()
       const appGun = useGunDb()

@@ -2,7 +2,7 @@ export default {
   app_name: 'DAINI',
   tag_line_1: 'Buy safe. Sell safe. ',
   tag_line_2: "No intermediary. That's DAINI",
-  tag_line_3: 'Buy safe. Sell safe. That\'s DAINI',
+  tag_line_3: "Buy safe. Sell safe. That's DAINI",
   login: 'Log In',
   signup: 'Sign Up',
   logout: 'Log Out',
@@ -31,7 +31,7 @@ export default {
       form_title: "Item's Description",
       sell_item: 'Publish To Market',
       price: 'Price (yen)',
-      success: 'Publish successfully.'
+      success: 'Publish successfully.',
     },
     left: 'left',
     price: 'Price',
@@ -59,6 +59,8 @@ export default {
       proceed_to_buy: 'Proceed To Buy',
       pay: 'Pay',
       stop: 'Stop',
+      delivered_goods: 'Delivered Goods',
+      received_goods: 'Received Goods',
       buyer_wins: 'Buyer wins',
       seller_wins: 'Seller wins',
       dispute: 'Dispute',
@@ -69,15 +71,25 @@ export default {
   },
   notification: {
     transaction: {
-      done_accept_to_sell: 'Sell successfully. Please wait for your customer to pay for your item.',
-      done_pay: 'Pay successfully.\nThe seller will deliver the goods to you within 1 week. Please wait patiently.',
-      done_dispute: 'Dispute successfully.\nThe meditator will now choose which side get the money back. Please wait patiently.',
-      done_set_winner: 'Choose successfully.\nThe winner can now receive the money back.',
-      done_get_money: 'Get money successfully.\nYour money will be transferred to your Blockchain address. Blockchain transaction will take time to execute. Please wait patiently.'
+      done_accept_to_sell:
+        'Sell successfully. Please wait for your customer to pay for your item.',
+      done_pay:
+        'Pay successfully. Please keep in mind that you will have to pay additional fee for the transaction fee used.\nThe seller will deliver the goods to you within 1 week. Please wait patiently.',
+      done_dispute:
+        'Dispute successfully.\nThe meditator will now choose which side get the money back. Please wait patiently.',
+      done_set_delivered_goods:
+        'Success. Your customer will be notified that the goods has been delivered.',
+      done_set_received_goods:
+        'Success. Your seller will be relieved that you received the goods.',
+      done_set_winner:
+        'Choose successfully.\nThe winner can now receive the money back.',
+      done_get_money:
+        'Get money successfully.\nYour money will be transferred to your Blockchain address. Blockchain transaction will take time to execute. Please wait patiently.',
     },
     market: {
-      buy_success: 'Buy successfully.\nPlease wait for the seller to accept your order.'
-    }
+      buy_success:
+        'Buy successfully.\nPlease wait for the seller to accept your order.',
+    },
   },
   error: {
     execution: 'Execution fail',
@@ -95,7 +107,12 @@ export default {
       'Cannot proceed with this transaction. Please try again a moment later',
     cant_fetch_transactions:
       "Cannot find your orders' data. Please try again in a few minutes.",
-
+    cant_dispute_this_transaction:
+      'Cannot dispute this transaction. Plesae try again in a few minutes.',
+    cant_set_delivered_this_transaction:
+      'Cannot notify customer. Please try again in a few minutes.',
+    cant_set_received_this_transaction:
+      'Cannot notify seller. Please try again in a few minutes.',
     something_is_wrong: 'Something is wrong.',
   },
 }

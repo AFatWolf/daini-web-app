@@ -8,14 +8,9 @@ export enum TRANSACTION_STATE {
   DONE_PROCEED_TO_BUY = 'done-proceed-to-buy',
   DONE_ACCEPT = 'do-accept',
   DONE_PAY = 'pay',
-  
-  // During transaction
-  PAYING = 'paying',
-  DELIVERING = 'delivering',
-  RECEIVING = 'receiving',
-  // Ending transaction
-  CHECKING_EVIDENCES = 'checking-evidences', // meditator checking evidences
   // Good end: buyer received goods and seller received money
+  DONE_SET_DELIVERED_GOODS = 'done-set-delivered-goods',
+  DONE_SET_RECEIVED_GOODS = 'done-set-received-goods',
   // Bad end: one side wins the bet
   DONE_DISPUTE = 'done-dispute',
   DONE_SET_WINNER = 'done-set-winner',
@@ -32,9 +27,10 @@ export enum TRANSACTION_FIELDS {
   BUYER = 'buyer',
   SELLER = 'seller',
   MEDITATOR = 'meditator',
+  PRODUCT = 'product',
   BUYER_EPRIV = 'buyerEpriv',
   SELLER_EPRIV = 'sellerEpriv',
-  BLOCKCHAIN_PRIVATE_KEY = 'BCEpriv'
+  BLOCKCHAIN_PRIVATE_KEY = 'BCEpriv',
 }
 
 //  TODO-REFACTOR

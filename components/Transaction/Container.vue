@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div
       class="d-flex flex-column"
       v-if="transactionList.buyer.list.length > 0"

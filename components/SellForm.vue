@@ -74,6 +74,15 @@ export default {
   methods: {
     onSubmit() {
       this.productStore.sellProduct(this.form)
+      this.$emit('sold')
+      this.resetForm()
+    },
+    resetForm() {
+      this.form = {
+        name: '',
+        totalQuantity: 1,
+        price: MIN_PRICE_YEN,
+      }
     },
   },
 }

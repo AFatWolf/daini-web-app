@@ -19,7 +19,7 @@ export enum TRANSACTION_STATE {
   // Bad end: one side wins the bet
   DONE_DISPUTE = 'done-dispute',
   DONE_SET_WINNER = 'done-set-winner',
-  DONE = 'done',
+  DONE_GET_MONEY = 'done-get-money',
 }
 
 export enum TRANSACTION_SIDE {

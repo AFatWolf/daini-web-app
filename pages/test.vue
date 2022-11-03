@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Icon name="box" />
     <!-- <NuxtWelcome /> -->
     <!-- <h1 class="text-primary">{{ t('hello', { name: 'vue-i18n' }) }}</h1> -->
     <FormKit

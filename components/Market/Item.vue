@@ -9,7 +9,7 @@
       </div>
       <div class="d-flex flex-row">
         <div class="fs-7 flex-grow-1 text-dark">
-          {{$t('item.price')}}:&nbsp{{ item.price }}
+          {{ $t('item.price') }}:&nbsp{{ item.price }}
         </div>
         <div
           v-if="item.leftQuantity || item.leftQuantity === 0"
@@ -58,17 +58,21 @@ export default {
       const order: IOrder = {
         name: item.name,
         soul: productSoul,
-        quantity: quantity, 
+        quantity: quantity,
         price: item.price * quantity,
         sellerAlias: item.sellerAlias,
-        meditatorAlias: 'MTgzjtlGTz8d4EyOxeRbFw94A-9i09ZwmwG-uAOvgw0.1LVb2lzKP6GXuk2wdcL3cb4bA69IThblD-g0G4k8504' // TODO-REMOVE
+        meditatorAlias:
+          'MTgzjtlGTz8d4EyOxeRbFw94A-9i09ZwmwG-uAOvgw0.1LVb2lzKP6GXuk2wdcL3cb4bA69IThblD-g0G4k8504', // TODO-REMOVE
       }
 
-      const { data, err } = await transactionStore.buy(order)
-      if(err) {
+      const { data, err, ok } = await transactionStore.buy(order)
+      if (err) {
         console.error(t(err))
+        putNotification(t(err))
         return
-      } 
+      } else if (ok) {
+        putNotification({ message: t('notification.market.buy_success') })
+      }
       console.log(data)
     },
   },

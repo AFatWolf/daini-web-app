@@ -8,6 +8,8 @@ interface IAuthState {
   userInfo: Object
   // user Reference in GUN DB
   userRef: Object
+  user: Object
+  isLoggedIn: boolean
   loading: {
     userInfo: boolean
   }
@@ -17,6 +19,8 @@ export const useAuthStore = defineStore('auth', {
   state: (): IAuthState => ({
     userInfo: {},
     userRef: {},
+    user: {},
+    isLoggedIn: false,
     loading: {
       userInfo: false,
     },
@@ -29,16 +33,19 @@ export const useAuthStore = defineStore('auth', {
     getSeaKeys() {
       return this.userInfo.sea
     },
-    getUsername() { // get Alias
+    getUsername() {
+      // get Alias
       return useGun().user().is?.alias || 'anon'
     },
     getAlias(state) {
-      return state.userInfo ? useTrimStart(state.userInfo.soul, '~') : this.getUsername() 
+      return state.userInfo
+        ? useTrimStart(state.userInfo.soul, '~')
+        : this.getUsername()
     },
     getUserRef: (state) => state.userRef || null,
-    isLoggedIn: () => {
-      return useGun().user().is
-    },
+    // isLoggedIn: (state) => {
+    //   return state.user?.is
+    // },
   },
   actions: {
     recall() {
@@ -46,10 +53,12 @@ export const useAuthStore = defineStore('auth', {
       const user = gun.user().recall({ sessionStorage: true }, (ack) => {
         this.loading.userInfo = false
         this.userInfo = ack
+        this.isLoggedIn = true
+        this.fetchUserRef()
+
         console.log(ack)
         console.log('userinfo', this.userInfo)
       })
-      this.fetchUserRef()
       return user
     },
     signUp(body: ILogInParams) {
@@ -65,6 +74,9 @@ export const useAuthStore = defineStore('auth', {
       const onLogin = (ack) => {
         this.loading.userInfo = false
         this.userInfo = ack
+        this.isLoggedIn = true
+        this.fetchUserRef()
+
         console.log(ack)
         console.log('userinfo', this.userInfo)
       }
@@ -73,10 +85,14 @@ export const useAuthStore = defineStore('auth', {
 
       this.loading.userInfo = true
       user.auth(body.username, body.password, onLogin)
-      this.fetchUserRef()
+    },
+    logOut() {
+      useGun().user().leave()
+      this.isLoggedIn = false
     },
     fetchUserRef() {
       this.userRef = this.userInfo['$']
+      this.user = useGun().user()
     },
     fetchPublicCurrentUserRef(key: string = '') {
       const alias = this.getAlias
@@ -84,11 +100,8 @@ export const useAuthStore = defineStore('auth', {
     },
     fetchPublicUserRef(alias: string, key: string = '') {
       const appGun = useGunDb()
-      if(!key) return appGun.get(USERS_KEY).get(alias)
+      if (!key) return appGun.get(USERS_KEY).get(alias)
       return appGun.get(USERS_KEY).get(key + '-' + alias)
     },
-    logOut() {
-      useGun().user.leave()
-    }
   },
 })

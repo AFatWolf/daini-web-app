@@ -76,14 +76,10 @@ export default {
       isLoggedIn,
     }
   },
-  watch: {
-    isLoggedIn(isCurrentlyLoggedIn) {
-      if (isCurrentlyLoggedIn) this.$emit('loggedIn')
-    },
-  },
   methods: {
     onSubmit() {
       this.authStore.logIn(this.model)
+      this.$emit('loggedIn')
     },
   },
 }

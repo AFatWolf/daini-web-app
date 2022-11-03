@@ -21,6 +21,7 @@
     "@vueuse/nuxt": "^9.1.1",
     "bootstrap": "^5.2.0",
     "elliptic": "^6.5.4",
+    "feather-icons": "^4.29.0",
     "gun": "^0.2020.1238",
     "js-sha3": "^0.8.0",
     "node-sass": "^7.0.1",

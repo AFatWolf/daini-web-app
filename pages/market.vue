@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="fs-3 text-dark">
       {{ $t('market.title') }}
     </div>

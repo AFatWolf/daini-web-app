@@ -6,7 +6,7 @@ import { WAREHOUSE_KEY } from '~~/constants/common'
 interface IMarketState {
   products: IProduct[]
   loading: {
-    fetchMarket: boolean
+    fetchProducts: boolean
   }
 }
 
@@ -14,14 +14,15 @@ export const useMarketStore = defineStore('market', {
   state: (): IMarketState => ({
     products: [],
     loading: {
-      fetchMarket: false,
+      fetchProducts: false,
     },
   }),
   getters: {
     getProductList: (state) => state.products || [],
   },
   actions: {
-    fetchProducts() {
+    async fetchProducts() {
+      if (this.loading.fetchProducts) return
       const gun = useGunDb()
       gun
         .get(WAREHOUSE_KEY)
@@ -33,7 +34,7 @@ export const useMarketStore = defineStore('market', {
     },
     fetchProductWithSoul(soul) {
       const gun = useGun()
-      gun.get(soul).get('items')
-    }
+      gun.get(soul)
+    },
   },
 })

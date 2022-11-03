@@ -2,7 +2,7 @@ export default {
   app_name: 'DAINI',
   tag_line_1: 'Buy safe. Sell safe. ',
   tag_line_2: "No intermediary. That's DAINI",
-  tag_line_3: "Buy safe. Sell safe. That's DAINI",
+  tag_line_3: "Buy safe. Sell safe.\nThat's DAINI",
   login: 'Log In',
   signup: 'Sign Up',
   logout: 'Log Out',
@@ -38,9 +38,11 @@ export default {
   },
   market: {
     title: 'Market, where you can buy stuff',
+    description: 'where you finds and buys goods'
   },
   warehouse: {
     title: 'Your Sold List',
+    description: 'where you sells your gooods',
     nothing: 'You are not sellling any products right now.',
     sell: 'Sell now!',
   },

@@ -146,7 +146,7 @@
           </div>
           <div
             v-if="
-              item.state === TRANSACTION_STATE.DONE_SET_WINNER &&
+              (item.state === TRANSACTION_STATE.DONE_SET_WINNER || item.state === TRANSACTION_STATE.DONE_SET_RECEIVED_GOODS) &&
               item.winnerAlias === authStore.getAlias
             "
           >

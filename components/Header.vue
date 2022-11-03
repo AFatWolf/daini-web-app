@@ -47,7 +47,7 @@
                 :stroke-width="isActive(WAREHOUSE_ROUTE.INDEX) ? 2 : 1"
             /></Anchor>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="isLoggedIn">
             <Anchor
               class="nav-link text-white"
               :class="{

@@ -50,7 +50,7 @@
             <div class="d-flex flex-column">
               <div
                 role="button"
-                class="mb-1 rounded rounded-pill btn btn-success"
+                class="mb-1 rounded rounded-pill btn btn-danger"
                 @click="dispute"
               >
                 {{ $t('transaction.button.dispute') }}
@@ -60,7 +60,7 @@
           <div
             v-if="
               item.state === TRANSACTION_STATE.DONE_SET_WINNER &&
-              item.winnerAlias == authStore.getAlias
+              item.winnerAlias === authStore.getAlias
             "
           >
             <div class="d-flex flex-column">
@@ -70,6 +70,26 @@
                 @click="getMoney(TRANSACTION_SIDE.BUYER)"
               >
                 {{ $t('transaction.button.get_money_back') }}
+              </div>
+            </div>
+          </div>
+          <div v-if="item.state === TRANSACTION_STATE.DONE_SET_DELIVERED_GOODS">
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="setReceivedGoods"
+              >
+                {{ $t('transaction.button.received_goods') }}
+              </div>
+            </div>
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
+                @click="dispute"
+              >
+                {{ $t('transaction.button.dispute') }}
               </div>
             </div>
           </div>
@@ -98,6 +118,26 @@
               <div
                 role="button"
                 class="mb-1 rounded rounded-pill btn btn-success"
+                @click="setDeliveredGoods"
+              >
+                {{ $t('transaction.button.delivered_goods') }}
+              </div>
+            </div>
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
+                @click="dispute"
+              >
+                {{ $t('transaction.button.dispute') }}
+              </div>
+            </div>
+          </div>
+          <div v-if="item.state === TRANSACTION_STATE.DONE_SET_DELIVERED_GOODS">
+            <div class="d-flex flex-column">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
                 @click="dispute"
               >
                 {{ $t('transaction.button.dispute') }}
@@ -169,10 +209,7 @@ export default {
     const soul = getGunNodeSoul(props.item)
     const transactionStore = useTransactionStore()
     const authStore = useAuthStore()
-    // transactionStore.fetchSingleTransactionBySoul(soul)
-    console.log(props.item.winnerAlias)
-    console.log(authStore.getAlias)
-    console.log(props.item.winnerAlias == authStore.getAlias)
+
     return {
       t,
       soul,
@@ -216,7 +253,7 @@ export default {
       const { err, ok } = await this.transactionStore.pay(this.soul)
       if (ok) {
         putNotification({
-          message: { message: this.t('notification.transaction.done_pay') },
+          message: this.t('notification.transaction.done_pay'),
         })
       } else if (err) {
         putNotification({ message: this.t(err) })
@@ -227,6 +264,30 @@ export default {
       if (ok) {
         putNotification({
           message: this.t('notification.transaction.done_dispute'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
+    },
+    async setDeliveredGoods() {
+      const { err, ok } = await this.transactionStore.setDeliveredGoods(
+        this.soul
+      )
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_set_delivered_goods'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
+    },
+    async setReceivedGoods() {
+      const { err, ok } = await this.transactionStore.setReceivedGoods(
+        this.soul
+      )
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_set_received_goods'),
         })
       } else if (err) {
         putNotification({ message: this.t(err) })
@@ -252,7 +313,7 @@ export default {
       )
       if (ok) {
         putNotification({
-          message: this.t('notification.transaction.done_set_winner'),
+          message: this.t('notification.transaction.done_get_money'),
         })
       } else if (err) {
         putNotification({ message: this.t(err) })

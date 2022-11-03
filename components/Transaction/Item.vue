@@ -9,6 +9,7 @@
       rounded rounded-2
       py-2
       px-3
+      my-1
     "
   >
     <div class="row">
@@ -27,27 +28,41 @@
         </div>
       </div>
       <div class="d-flex flex-column my-auto col-sm-3 col-12 fs-7">
-        <!-- <div>{{ $t('transaction.role') }}:&nbsp</div> -->
         <div v-if="role === TRANSACTION_SIDE.BUYER">
-          <!-- {{ $t('transaction.buyer') }} -->
           <div v-if="item.state === TRANSACTION_STATE.DONE_ACCEPT_TO_SELL">
             <div class="d-flex flex-column">
-              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="pay">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="pay"
+              >
                 {{ $t('transaction.button.pay') }}
               </div>
-              <div role="button" class="mb-1 rounded rounded-pill btn btn-danger">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
+              >
                 {{ $t('transaction.button.stop') }}
               </div>
             </div>
           </div>
           <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
             <div class="d-flex flex-column">
-              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="dispute">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="dispute"
+              >
                 {{ $t('transaction.button.dispute') }}
               </div>
             </div>
           </div>
-          <div v-if="item.state === TRANSACTION_STATE.DONE_SET_WINNER">
+          <div
+            v-if="
+              item.state === TRANSACTION_STATE.DONE_SET_WINNER &&
+              item.winnerAlias == authStore.getAlias
+            "
+          >
             <div class="d-flex flex-column">
               <div
                 role="button"
@@ -70,14 +85,21 @@
               >
                 {{ $t('transaction.button.accept_to_sell') }}
               </div>
-              <div role="button" class="mb-1 rounded rounded-pill btn btn-danger">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-danger"
+              >
                 {{ $t('transaction.button.refuse_to_sell') }}
               </div>
             </div>
           </div>
           <div v-if="item.state === TRANSACTION_STATE.DONE_PAY">
             <div class="d-flex flex-column">
-              <div role="button" class="mb-1 rounded rounded-pill btn btn-success" @click="dispute">
+              <div
+                role="button"
+                class="mb-1 rounded rounded-pill btn btn-success"
+                @click="dispute"
+              >
                 {{ $t('transaction.button.dispute') }}
               </div>
             </div>
@@ -85,7 +107,7 @@
           <div
             v-if="
               item.state === TRANSACTION_STATE.DONE_SET_WINNER &&
-              item.winnerAlias == authStore.getAlias
+              item.winnerAlias === authStore.getAlias
             "
           >
             <div class="d-flex flex-column">
@@ -143,12 +165,16 @@ export default {
     },
   },
   setup(props) {
+    const { t } = useLang()
     const soul = getGunNodeSoul(props.item)
     const transactionStore = useTransactionStore()
     const authStore = useAuthStore()
     // transactionStore.fetchSingleTransactionBySoul(soul)
-
+    console.log(props.item.winnerAlias)
+    console.log(authStore.getAlias)
+    console.log(props.item.winnerAlias == authStore.getAlias)
     return {
+      t,
       soul,
       TRANSACTION_SIDE,
       TRANSACTION_STATE,
@@ -175,20 +201,62 @@ export default {
     }
   },
   methods: {
-    acceptToSell() {
-      this.transactionStore.acceptToSell(this.soul)
+    async acceptToSell() {
+      const { err, ok } = await this.transactionStore.acceptToSell(this.soul)
+      debugger
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_accept_to_sell'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
     },
-    pay() {
-      this.transactionStore.pay(this.soul)
+    async pay() {
+      const { err, ok } = await this.transactionStore.pay(this.soul)
+      if (ok) {
+        putNotification({
+          message: { message: this.t('notification.transaction.done_pay') },
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
     },
-    dispute() {
-      this.transactionStore.dispute(this.soul)
+    async dispute() {
+      const { err, ok } = await this.transactionStore.dispute(this.soul)
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_dispute'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
     },
-    setWinner(winner: TRANSACTION_SIDE) {
-      this.transactionStore.setWinner(this.soul, winner)
+    async setWinner(winner: TRANSACTION_SIDE) {
+      const { err, ok } = await this.transactionStore.setWinner(
+        this.soul,
+        winner
+      )
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_set_winner'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
     },
-    getMoney(winner: TRANSACTION_SIDE) {
-      this.transactionStore.getMoney(this.soul, winner)
+    async getMoney(winner: TRANSACTION_SIDE) {
+      const { err, ok } = await this.transactionStore.getMoney(
+        this.soul,
+        winner
+      )
+      if (ok) {
+        putNotification({
+          message: this.t('notification.transaction.done_set_winner'),
+        })
+      } else if (err) {
+        putNotification({ message: this.t(err) })
+      }
     },
   },
 }

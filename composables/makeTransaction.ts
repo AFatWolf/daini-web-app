@@ -24,7 +24,7 @@ export const makeTransaction = async (
   return new Promise(async (resolve, reject) => {
     web3.eth.sendTransaction(transaction, (err, res) => {
       if (err) resolve({ err })
-      resolve(res)
+      resolve({ hash: res })
     })
   })
 }

@@ -6,6 +6,23 @@ export const TRANSACTIONS_KEY = 'transactions'
 
 export const USERS_KEY = 'daini-users'
 
+export const HOME_ROUTE = {
+    HOME: '/',
+    INDEX: 'index',
+    LOGIN: 'login',
+    SIGNUP: 'signup',
+}
+
 export const WAREHOUSE_ROUTE = {
-    DETAIL: 'warehouse-productSoul'
+  INDEX: 'warehouse',
+  DETAIL: 'warehouse-productSoul',
+  SELL: 'sell',
+}
+
+export const MARKET_ROUTE = {
+  INDEX: 'market',
+}
+
+export const TRANSACTIONS_ROUTE = {
+  INDEX: 'transactions',
 }

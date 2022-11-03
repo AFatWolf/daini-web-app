@@ -1,6 +1,6 @@
 <template>
-  <Anchor :to="to">
-    <div class="card">
+  <Anchor class="text-decoration-none w-100" :to="to">
+    <div class="card w-100 h-100">
       <!-- <img class="card-img-top" src="..." alt="Card image cap" /> -->
       <div class="card-body">
         <div class="fs-3 card-title">{{ item.name }}</div>

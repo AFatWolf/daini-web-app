@@ -122,7 +122,19 @@ export const useTransactionStore = defineStore('transaction', {
 
       return { data, ok: 1 }
     },
-
+    /**
+     * Update local transaction data
+     * @param soul
+     */
+    setLocalTransactionBySoul(soul, args = {}) {
+      const transaction = this.transactionBySoul[soul]
+      if (transaction) {
+        this.transactionBySoul[soul] = {
+          ...transaction,
+          ...args,
+        }
+      }
+    },
     // Consider using decorator to separate Buyer and Seller
 
     /* Called when buyer click 'Buy' */
@@ -226,6 +238,7 @@ export const useTransactionStore = defineStore('transaction', {
       }
 
       this.loading.buy = false
+
       return { data: putData, ok: 1 }
     },
 
@@ -314,6 +327,10 @@ export const useTransactionStore = defineStore('transaction', {
       if (putData.err) {
         return { err: 'error.cant_accept_this_transaction' }
       }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_ACCEPT_TO_SELL,
+      })
       return { data: putData, ok: 1 }
     },
     /* Called when a buyer buy a product and accept it */
@@ -331,7 +348,7 @@ export const useTransactionStore = defineStore('transaction', {
         buyer: buyerLink,
         seller: sellerLink,
         meditator: meditatorLink,
-        product: productLink
+        product: productLink,
       } = await useOnceToPromise(transactionRef)
 
       const buyerSoul = getGunNodeSoul(buyerLink)
@@ -374,9 +391,12 @@ export const useTransactionStore = defineStore('transaction', {
       const BCAddress = getBCAddress(BCAddressPublicKey)
       // TODO-REMOVE
       console.log('(Pay) BC address: ', BCAddress)
-      const priceInWei = getExchangeYenToWei(product.price) + GAS_FEE * GAS_PRICE
-      makeTransaction(BCAddress, priceInWei)
-
+      const priceInWei =
+        getExchangeYenToWei(product.price) + GAS_FEE * GAS_PRICE
+      const { hash, err } = await makeTransaction(BCAddress, priceInWei)
+      if (err || !hash) {
+        return { err: 'error.cant_proceed_this_transaction' }
+      }
       const encryptedBCAddress = await SEA.encrypt(BCAddress, buyerSeaPair)
 
       // Send money to the Address
@@ -413,6 +433,10 @@ export const useTransactionStore = defineStore('transaction', {
       if (putData.err) {
         return { err: 'error.cant_proceed_this_transaction' }
       }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_PAY,
+      })
       return { data: putData, ok: 1 }
     },
     /* Called when seller has delivered the goods */
@@ -438,6 +462,10 @@ export const useTransactionStore = defineStore('transaction', {
       if (putData.err) {
         return { err: 'error.cant_dispute_this_transaction' }
       }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_DISPUTE,
+      })
       return { data: putData, ok: 1 }
     },
     async setWinner(transactionSoul: string, winnerSide: TRANSACTION_SIDE) {
@@ -493,6 +521,10 @@ export const useTransactionStore = defineStore('transaction', {
       if (putData.err) {
         return { err: 'error.cant_set_winner_for_this_transaction' }
       }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_SET_WINNER,
+      })
       return { data: putData, ok: 1 }
     },
     /* Call when either buyer or seller get (back) money */
@@ -527,7 +559,7 @@ export const useTransactionStore = defineStore('transaction', {
       const winner = await useOnceToPromise(gun.get(winnerSoul))
       const loser = await useOnceToPromise(gun.get(loserSoul))
       const product = await useOnceToPromise(gun.get(productSoul))
-      
+
       if (!loser.alias || winner.alias != authStore.getAlias) {
         return { err: 'error.cant_proceed_this_transaction' }
       }
@@ -552,12 +584,24 @@ export const useTransactionStore = defineStore('transaction', {
       const BCEPub = BCPair.getPublic().encode('hex') // remove 04 prefix
       const BCAddress = getBCAddress(BCEPub)
       const BCAddress2 = await SEA.decrypt(winner.BCAddress, winnerSeaPair)
-      
+
       const accounts = await web3.eth.requestAccounts()
       const account = accounts[0]
-      const amount = getExchangeYenToWei(product.price) 
+      const amount = getExchangeYenToWei(product.price)
       debugger
-      makeSignedTransaction(account, BCEpriv, amount)
+      const { err, hash } = await makeSignedTransaction(
+        account,
+        BCEpriv,
+        amount
+      )
+      if (err || !hash) {
+        return { err: 'error.cant_proceed_this_transaction' }
+      }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_GET_MONEY,
+      })
+      return { data: hash, ok: 1 }
       console.log('BCAddress: ', BCAddress)
       console.log('BC2Address: ', getBCAddress(BCAddress2))
       console.log('BC private key: ', BCEpriv)

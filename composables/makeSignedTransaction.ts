@@ -30,7 +30,7 @@ export const makeSignedTransaction = async (
       signedTransaction.rawTransaction,
       (err, res) => {
         if (err) resolve({ err })
-        resolve(res)
+        resolve({ hash: res })
       }
     )
   })

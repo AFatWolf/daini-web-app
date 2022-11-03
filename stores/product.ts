@@ -58,7 +58,7 @@ export const useProductStore = defineStore('item-stock', {
 
       const linkProductToOwner = () => {
         const productRef = gun.get(WAREHOUSE_KEY).get(product.id)
-        debugger
+
         // Link product Reference to user
         userRef.set(productRef, (ack) => {
           if (ack.error) {
@@ -80,6 +80,8 @@ export const useProductStore = defineStore('item-stock', {
         }
         this.loading.sellProduct = false
       })
+
+      return { ok: 1 }
     },
   },
 })

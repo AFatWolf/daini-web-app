@@ -2,6 +2,7 @@
   <div>
     <NuxtLayout>
       <NuxtPage />
+      <!-- <GlobalDialogs /> -->
     </NuxtLayout>
   </div>
 </template>

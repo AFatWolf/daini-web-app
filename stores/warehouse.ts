@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia'
 import { useGun } from '@gun-vue/composables'
 import { IProduct } from '@/interfaces/product'
-import { WAREHOUSE_KEY } from '~~/constants/common'
-import { useAuthStore } from './auth'
+import { WAREHOUSE_KEY } from '@/constants/common'
+import { useAuthStore } from '@/stores/auth'
 
 interface IWarehouseState {
   products: IProduct[]
   // Type: {string: IProduct}
   productsBySoul: Object
   souls: string[]
+  alias: string
   loading: {
     fetchWarehouse: boolean
   }
@@ -19,6 +20,7 @@ export const useWarehouseStore = defineStore('warehouse', {
     products: [],
     productsBySoul: {},
     souls: [],
+    alias: '',
     loading: {
       fetchWarehouse: false,
     },
@@ -36,15 +38,19 @@ export const useWarehouseStore = defineStore('warehouse', {
   },
   actions: {
     fetchProducts() {
-      // If already fetched and set up listener
-      if (!isEmpty(this.productsBySoul)) return
-
       const authStore = useAuthStore()
+      // If already fetched and set up listener
+      if (!isEmpty(this.productsBySoul) && this.alias === authStore.getAlias) return
+
       const userRef = authStore.fetchPublicCurrentUserRef(WAREHOUSE_KEY)
       const gun = useGun()
 
       if (!userRef) return
 
+      // Reset
+      this.alias = authStore.getAlias
+      this.souls = []
+      this.productsBySoul = {}
       userRef.map().on((data) => {
         console.log('Warehouse:', data)
         if (typeof data === 'object' && data) {

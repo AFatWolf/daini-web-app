@@ -3,7 +3,7 @@
     <div class="container" v-if="hasProducts">
       <div class="row">
         <div class="fs-3 text-dark">
-          {{ $t("warehouse.title") }}
+          {{ $t('warehouse.title') }}
         </div>
       </div>
       <WarehouseContainer :items="warehouseStore.getProductList" />
@@ -33,16 +33,21 @@
 <script>
 import { useWarehouseStore } from '@/stores/warehouse'
 import { WAREHOUSE_ROUTE } from '@/constants/common'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   setup() {
     const warehouseStore = useWarehouseStore()
+    const authStore = useAuthStore()
 
     warehouseStore.fetchProducts()
+
+
 
     return {
       WAREHOUSE_ROUTE,
       warehouseStore,
+      authStore,
     }
   },
   computed: {

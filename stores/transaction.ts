@@ -2,6 +2,7 @@ import {
   TRANSACTION_STATE,
   TRANSACTION_FIELDS,
   TRANSACTION_SIDE,
+  TRANSACTION_STATE_SEQUENCE,
 } from '@/constants/transaction'
 import { ITransaction, ISide, IOrder } from '@/interfaces/transaction'
 import { defineStore } from 'pinia'
@@ -11,6 +12,7 @@ import { useAuthStore } from './auth'
 import { TRANSACTIONS_KEY } from '@/constants/common'
 import Web3 from 'web3'
 import { GAS_FEE, GAS_PRICE } from '@/constants/transaction'
+import { useMarketStore } from './market'
 
 const ec = new EC('secp256k1')
 const web3 = new Web3(Web3.givenProvider || 'http://127.0.0.1:7545')
@@ -41,7 +43,10 @@ export const useTransactionStore = defineStore('transaction', {
     },
   }),
   getters: {
-    getTransactionList: (state) => Object.values(state.transactionBySoul),
+    getTransactionList: (state) =>
+      useSortBy(Object.values(state.transactionBySoul), [
+        (obj) => -TRANSACTION_STATE_SEQUENCE[obj.state],
+      ]), // Large -> Small
     getTransactionBySoul: (state) => {
       return (soul) => {
         return state.transactionBySoul[soul] || null
@@ -145,6 +150,7 @@ export const useTransactionStore = defineStore('transaction', {
       const gun = useGun()
       const appGun = useGunDb()
       const authStore = useAuthStore()
+      const marketStore = useMarketStore()
       if (!authStore.isLoggedIn || !authStore.userRef) {
         return { err: 'error.not_logged_in' }
       }
@@ -168,6 +174,24 @@ export const useTransactionStore = defineStore('transaction', {
       } = order
       const productId = useTruncate('["' + stringifiedBuyerKeyPair.epub) // temporary
 
+      // Update product left quantity
+      const productRef = gun.get(productSoul)
+      const productData = await useOnceToPromise(productRef)
+      if (productData.leftQuantity <= 0) {
+        this.loading.buy = false
+        return { err: 'error.cant_buy_product' }
+      }
+      const putProductRet = await usePutToPromise(productRef, {
+        leftQuantity: productData.leftQuantity - quantity,
+      })
+      if (putProductRet.err) {
+        this.loading.buy = false
+        return { err: 'error.cant_buy_product' }
+      }
+      // Set Local Product Data
+      marketStore.setLocalProductWithSoul(productSoul, {
+        leftQuantity: productData.leftQuantity - quantity,
+      })
       // Craft transaction
       const transaction: ITransaction = {
         id: productId,
@@ -334,7 +358,103 @@ export const useTransactionStore = defineStore('transaction', {
       return { data: putData, ok: 1 }
     },
     /* Called when a buyer buy a product and accept it */
-    async refuseToSell(transactionSoul: string) {},
+    async refuseToSell(transactionSoul: string) {
+      const gun = useGun()
+      const appGun = useGunDb()
+      const authStore = useAuthStore()
+      const marketStore = useMarketStore()
+      if (!authStore.isLoggedIn || !authStore.userRef) {
+        return { err: 'error.not_logged_in' }
+      }
+      const transactionRef = gun.get(transactionSoul)
+      const { seller: sellerLink, product: productLink } =
+        await useOnceToPromise(transactionRef)
+
+      const sellerSoul = getGunNodeSoul(sellerLink)
+      const productSoul = getGunNodeSoul(productLink)
+      const seller = await useOnceToPromise(gun.get(sellerSoul))
+      const product = await useOnceToPromise(gun.get(productSoul)) // product transaction data
+      if (authStore.getAlias !== seller.alias) {
+        return { err: 'error.cant_refuse_this_transaction' }
+      }
+
+      // Update product left quantity
+      const productRef = gun.get(product.soul)
+      const productData = await useOnceToPromise(productRef)
+      const putProductRet = await usePutToPromise(productRef, {
+        leftQuantity: productData.leftQuantity + product.quantity,
+      })
+      if (putProductRet.err) {
+        this.loading.buy = false
+        return { err: 'error.cant_refuse_this_transaction' }
+      }
+      // Set Local Product Data
+      marketStore.setLocalProductWithSoul(productSoul, {
+        leftQuantity: productData.leftQuantity + productData.quantity,
+      })
+
+      const putData = await usePutToPromise(gun.get(transactionSoul), {
+        state: TRANSACTION_STATE.DONE_REFUSE_TO_SELL,
+      })
+
+      if (putData.err) {
+        return { err: 'error.cant_refuse_this_transaction' }
+      }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_REFUSE_TO_SELL,
+      })
+      return { data: putData, ok: 1 }
+    },
+    async cancelOrder(transactionSoul: string) {
+      const gun = useGun()
+      const appGun = useGunDb()
+      const authStore = useAuthStore()
+      const marketStore = useMarketStore()
+      if (!authStore.isLoggedIn || !authStore.userRef) {
+        return { err: 'error.not_logged_in' }
+      }
+      const transactionRef = gun.get(transactionSoul)
+      const { buyer: buyerLink, product: productLink } = await useOnceToPromise(
+        transactionRef
+      )
+
+      const buyerSoul = getGunNodeSoul(buyerLink)
+      const productSoul = getGunNodeSoul(productLink)
+      const buyer = await useOnceToPromise(gun.get(buyerSoul))
+      const product = await useOnceToPromise(gun.get(productSoul)) // product transaction data
+      if (authStore.getAlias !== buyer.alias) {
+        return { err: 'error.cant_cancel_this_transaction' }
+      }
+
+      // Update product left quantity
+      const productRef = gun.get(product.soul)
+      const productData = await useOnceToPromise(productRef)
+      const putProductRet = await usePutToPromise(productRef, {
+        leftQuantity: productData.leftQuantity + product.quantity,
+      })
+      if (putProductRet.err) {
+        this.loading.buy = false
+        return { err: 'error.cant_refuse_this_transaction' }
+      }
+      // Set Local Product Data
+      marketStore.setLocalProductWithSoul(productSoul, {
+        leftQuantity: productData.leftQuantity + productData.quantity,
+      })
+
+      const putData = await usePutToPromise(gun.get(transactionSoul), {
+        state: TRANSACTION_STATE.DONE_CANCEL,
+      })
+
+      if (putData.err) {
+        return { err: 'error.cant_cancel_this_transaction' }
+      }
+      /* Update local data to update UI */
+      this.setLocalTransactionBySoul(transactionSoul, {
+        state: TRANSACTION_STATE.DONE_CANCEL,
+      })
+      return { data: putData, ok: 1 }
+    },
     /* Called from buyer side to proceed with the transaction*/
     async pay(transactionSoul: string) {
       const gun = useGun()
@@ -511,7 +631,7 @@ export const useTransactionStore = defineStore('transaction', {
     /* Called when seller has received the money */
     async setReceivedMoney(transactionSoul: string) {
       // Basically, the winner is seller, the loser is buyer
-      return await this.getMoney(transactionSoul, TRANSACTION_SIDE.SELLER) 
+      return await this.getMoney(transactionSoul, TRANSACTION_SIDE.SELLER)
     },
     async dispute(transactionSoul: string) {
       const gun = useGun()
@@ -538,6 +658,7 @@ export const useTransactionStore = defineStore('transaction', {
       const gun = useGun()
       const appGun = useGunDb()
       const authStore = useAuthStore()
+      const marketStore = useMarketStore()
       if (!authStore.isLoggedIn || !authStore.userRef) {
         return { err: 'error.not_logged_in' }
       }
@@ -546,14 +667,17 @@ export const useTransactionStore = defineStore('transaction', {
         buyer: buyerLink,
         seller: sellerLink,
         meditator: meditatorLink,
+        product: productLink,
       } = await useOnceToPromise(transactionRef)
-
+      debugger
       const buyerSoul = getGunNodeSoul(buyerLink)
       const sellerSoul = getGunNodeSoul(sellerLink)
       const meditatorSoul = getGunNodeSoul(meditatorLink)
+      const productSoul = getGunNodeSoul(productLink)
       const buyer = await useOnceToPromise(gun.get(buyerSoul))
       const seller = await useOnceToPromise(gun.get(sellerSoul))
       const meditator = await useOnceToPromise(gun.get(meditatorSoul))
+      const product = await useOnceToPromise(gun.get(productSoul)) // product transaction data
 
       if (!buyer.alias || !seller.alias) {
         return { err: 'error.cant_proceed_this_transaction' }
@@ -563,15 +687,32 @@ export const useTransactionStore = defineStore('transaction', {
         winner = buyer
         loser = seller
         encryptedLoserEpriv = meditator[TRANSACTION_FIELDS.SELLER_EPRIV]
+        // Update product left quantity
+
+        const productRef = gun.get(product.soul)
+        const productData = await useOnceToPromise(productRef)
+        const putProductRet = await usePutToPromise(productRef, {
+          leftQuantity: productData.leftQuantity + product.quantity,
+        })
+        // Set Local Product Data
+        marketStore.setLocalProductWithSoul(productSoul, {
+          leftQuantity: productData.leftQuantity + productData.quantity,
+        })
       } else {
         winner = seller
         loser = buyer
         encryptedLoserEpriv = meditator[TRANSACTION_FIELDS.BUYER_EPRIV]
       }
-      // Passphrase between Winner and Meditator
+      // // Passphrase between Winner and Meditator
       const sharedPassphraseWM = await getSharedSecretPassphrase(winner.alias)
       // Passphrase between Loser and Meditator
       const sharedPassphraseLM = await getSharedSecretPassphrase(loser.alias)
+      console.log('Shared passphrase LM: ', sharedPassphraseLM)
+
+      if (sharedPassphraseLM.err) {
+        console.log(sharedPassphraseLM.err)
+        return { err: 'error.cant_set_winner_for_this_transaction' }
+      }
       // loserEpriv is still encrypted by shared passphrase between loser and winner
       // It will be object, so we have to stringify it again
       const loserEpriv = JSON.stringify(
@@ -601,7 +742,7 @@ export const useTransactionStore = defineStore('transaction', {
       if (!authStore.isLoggedIn || !authStore.userRef) {
         return { err: 'error.not_logged_in' }
       }
-
+      debugger
       const transactionRef = gun.get(transactionSoul)
       const {
         buyer: buyerLink,
@@ -654,7 +795,7 @@ export const useTransactionStore = defineStore('transaction', {
       const accounts = await web3.eth.requestAccounts()
       const account = accounts[0]
       const amount = getExchangeYenToWei(product.price)
-      debugger
+
       const { err, hash } = await makeSignedTransaction(
         account,
         BCEpriv,
@@ -663,16 +804,19 @@ export const useTransactionStore = defineStore('transaction', {
       if (err || !hash) {
         return { err: 'error.cant_proceed_this_transaction' }
       }
+
+      const putData = await usePutToPromise(gun.get(transactionSoul), {
+        state: TRANSACTION_STATE.DONE_GET_MONEY,
+      })
+      if (putData.err) {
+        return { err: 'error.cant_proceed_this_transaction' }
+      }
       /* Update local data to update UI */
       this.setLocalTransactionBySoul(transactionSoul, {
         state: TRANSACTION_STATE.DONE_GET_MONEY,
       })
       return { data: hash, ok: 1 }
-      console.log('BCAddress: ', BCAddress)
-      console.log('BC2Address: ', getBCAddress(BCAddress2))
-      console.log('BC private key: ', BCEpriv)
     },
     /* Called when user want to cancel the transaction. Can depend on the state of transaction */
-    cancel() {},
   },
 })

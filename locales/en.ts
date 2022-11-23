@@ -38,7 +38,8 @@ export default {
   },
   market: {
     title: 'Market, where you can buy stuff',
-    description: 'where you finds and buys goods'
+    description: 'where you finds and buys goods',
+    sold_out: 'Sold Out',
   },
   warehouse: {
     title: 'Your Sold List',
@@ -48,6 +49,8 @@ export default {
   },
   transaction: {
     title: 'Transactions',
+    nothing: 'You did not have any orders ongoing.',
+    go_to_market: 'Go To Market',
     role: 'Role',
     buyer: 'Buyer',
     buyer_order: 'Your Orders',
@@ -61,6 +64,7 @@ export default {
       proceed_to_buy: 'Proceed To Buy',
       pay: 'Pay',
       stop: 'Stop',
+      cancel_order: 'Cancel Order',
       delivered_goods: 'Delivered Goods',
       received_goods: 'Received Goods',
       buyer_wins: 'Buyer wins',
@@ -68,6 +72,27 @@ export default {
       dispute: 'Dispute',
       get_money: 'Get Money',
       get_money_back: 'Get Money Back',
+    },
+    description: {
+      done_buy:
+        'The order has been sent. Please wait for the seller to confirm your order.',
+      done_accept_to_sell:
+        'The order has been accepted.',
+      done_pay:
+        'The order has been paid.',
+      done_dispute:
+        'One of the sides has disputed the order. The order will now be put on hold and waited for the judgement of the meditator.',
+      done_set_delivered_goods:
+        'The goods has been on the way to the buyer.',
+      done_set_received_goods:
+        'The goods has been received by the buyer successfully.',
+      done_set_winner:
+        'Winner of the dispute has been chosen. The winner will have a button to receive the money.',
+      done_get_money:
+        'The money of the order has been taken successfully.',
+      done_cancel_order: 'The order has been canceled.',
+      done_refuse_to_sell:
+        'The order has been refused by the seller.',
     },
     state: 'State',
   },
@@ -87,6 +112,9 @@ export default {
         'Choose successfully.\nThe winner can now receive the money back.',
       done_get_money:
         'Get money successfully.\nYour money will be transferred to your Blockchain address. Blockchain transaction will take time to execute. Please wait patiently.',
+      done_cancel_order: 'Cancel order successlly.',
+      done_refuse_to_sell:
+        'Refused to sell.\nThe customer of the order will be informed of the refusal.',
     },
     market: {
       buy_success:
@@ -101,12 +129,17 @@ export default {
       'You are not logged in. Please log in to execute this action',
 
     no_product: 'Cannot find product.',
+    no_product_left: 'Theres no item left for this product.',
     cant_buy_product: 'Cannot buy product. Please try again a moment later.',
 
     cant_accept_this_transaction:
       'Cannot accept this transaction. Please try again a moment later',
+    cant_refuse_this_transaction:
+      'Cannot refuse this transaction. Please try again a moment later.',
     cant_proceed_this_transaction:
       'Cannot proceed with this transaction. Please try again a moment later',
+    cant_cancel_this_transaction:
+      'Cannot cancel this transaction. Please try again a moment later.',
     cant_fetch_transactions:
       "Cannot find your orders' data. Please try again in a few minutes.",
     cant_dispute_this_transaction:

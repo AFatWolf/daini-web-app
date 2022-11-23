@@ -80,8 +80,8 @@ export default {
     resetForm() {
       this.form = {
         name: '',
-        totalQuantity: 1,
-        price: MIN_PRICE_YEN,
+        totalQuantity: '',
+        price: '',
       }
     },
   },

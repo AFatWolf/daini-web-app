@@ -85,15 +85,21 @@ export default {
       console.log('2: ', test)
     },
     async doThings3() {
-      const msg =
-        '{"ct":"swZFNwX65lgF1OskqPQVo88mrNkQYtVWapXiC5T3FDu2mbY1WnJU0osbKfAe1NAAIgGkSL/VK5NUqrB7fMRuojy+/MrRXs988xhxIvEttmc=","iv":"d7CLg9Gi+V2nOvo3gJnk","s":"H++vFN5VA/Z8"}'
-      const passphrase = 'x19RyXl3sOcb8Kjjtpdr-AJHS06t0zm6Tyd93FOo8es'
-      const de = await SEA.decrypt(JSON.parse(msg), passphrase)
-      console.log('Decrypted: ', de)
-      debugger
-      const sea = await useOnceToPromise(useGun().get("~nFqpOGCTGHk_LbI-SBkx1Gw7xVA8rGg6zcGXfGhJWjo._hWGvjDFrytyGt3LWuBdtHbAoTnGcX2_XMjuzSfWyYA"))
-      console.log(sea)
-      debugger
+      // const msg =
+      //   '{"ct":"swZFNwX65lgF1OskqPQVo88mrNkQYtVWapXiC5T3FDu2mbY1WnJU0osbKfAe1NAAIgGkSL/VK5NUqrB7fMRuojy+/MrRXs988xhxIvEttmc=","iv":"d7CLg9Gi+V2nOvo3gJnk","s":"H++vFN5VA/Z8"}'
+      // const passphrase = 'x19RyXl3sOcb8Kjjtpdr-AJHS06t0zm6Tyd93FOo8es'
+      // const de = await SEA.decrypt(JSON.parse(msg), passphrase)
+      // console.log('Decrypted: ', de)
+      // debugger
+      // const sea = await useOnceToPromise(useGun().get("~nFqpOGCTGHk_LbI-SBkx1Gw7xVA8rGg6zcGXfGhJWjo._hWGvjDFrytyGt3LWuBdtHbAoTnGcX2_XMjuzSfWyYA"))
+      // console.log(sea)
+      // debugger
+      // await await putNotification({
+      //   message: 'Hello',
+      // })
+      await putNotification({
+        message: 'Hello',
+      })
     },
   },
 }

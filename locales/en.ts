@@ -24,6 +24,7 @@ export default {
     price: 'Price',
     purchase: 'Purchase',
     view: 'View',
+    cancel: 'Cancel',
   },
   item: {
     sell: {

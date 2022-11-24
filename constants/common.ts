@@ -31,3 +31,6 @@ export enum GLOBAL_DIALOG {
   WARNING = 'global-dialog-warning',
 }
 
+export const WARNING_TYPE = {
+  DELETE: 'delete'
+}

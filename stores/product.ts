@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { IProduct, IItem } from '@/interfaces/product'
+import { IProduct } from '@/interfaces/product'
 import { WAREHOUSE_KEY } from '@/constants/common'
 import { ec as EC } from 'elliptic'
 import { useAuthStore } from '@/stores/auth'

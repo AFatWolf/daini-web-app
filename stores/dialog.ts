@@ -29,9 +29,6 @@ export const useDialogStore = defineStore('dialog', {
     },
   }),
   actions: {
-    /*
-     * Initialize archive dialog
-     */
     initWarning(args = {}) {
       if (process.client && !this.warning.modal) {
         this.warning.modal = useConfirmDialog()

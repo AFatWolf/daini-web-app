@@ -58,7 +58,7 @@ export default {
     async onPurchase() {
       const { t, transactionStore, item, productSoul } = this
       if (item.leftQuantity <= 0) {
-        putNotification({ message: t('error.no_product_left') })
+        await putNotification({ message: t('error.no_product_left') })
         return
       }
       const quantity = 1 // TODO-REFACTOR: fix this
@@ -75,10 +75,10 @@ export default {
       const { data, err, ok } = await transactionStore.buy(order)
       if (err) {
         console.error(t(err))
-        putNotification({ message: t(err) })
+        await putNotification({ message: t(err) })
         return
       } else if (ok) {
-        putNotification({ message: t('notification.market.buy_success') })
+        await putNotification({ message: t('notification.market.buy_success') })
       }
       console.log(data)
     },

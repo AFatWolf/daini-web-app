@@ -38,9 +38,9 @@ export default {
     }
   },
   methods: {
-    onSold() {
+    async onSold() {
       // console.log(this.t('item.sell.success'))
-      putNotification({ message: this.t('item.sell.success') })
+      await putNotification({ message: this.t('item.sell.success') })
     },
   },
 }

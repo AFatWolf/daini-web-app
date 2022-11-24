@@ -10,35 +10,6 @@
       @hidden="onWarningHidden"
       @confirm="onWarningConfirm"
     />
-
-    <div class="position-fixed bottom-0 end-0 px-2 z-index-tooltip">
-      <Toast
-        v-if="errorHandle.notify?.detail"
-        :type="errorHandle.notify?.type"
-        class="my-2"
-        data-role="toast-notify"
-      >
-        {{ errorHandle.notify.detail }}
-      </Toast>
-      <Toast
-        v-if="errorHandle.alert?.detail"
-        data-role="toast-error-client"
-        class="my-2"
-      >
-        {{ errorHandle.alert.detail }}
-      </Toast>
-      <Toast
-        v-for="error in errorHandle.errors"
-        v-else
-        :key="error.code"
-        :title="error.message"
-        class="my-2"
-        data-role="toast-error-api"
-      >
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-html="error.detail"></div>
-      </Toast>
-    </div>
   </div>
 </template>
 
@@ -57,9 +28,10 @@ export default {
       }
     })
 
-    const errorHandle = useErrorHandle()
-
-    return { errorHandle, warningModalId, warningDialog }
+    return {
+      warningModalId,
+      warningDialog,
+    }
   },
   methods: {
     onWarningHidden() {

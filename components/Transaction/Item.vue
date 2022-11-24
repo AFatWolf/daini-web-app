@@ -17,8 +17,8 @@
         <div class="fs-4 fw-bold text-dark">
           {{ item.product?.name }}
         </div>
-        <div class="fs-6 text-dark">
-          {{ $t('transaction.state') }}:&nbsp{{ item.state }}
+        <div class="fs-5 text-dark">
+          {{ getTransactionStateDescription(item.state, t) }}
         </div>
         <div class="fs-6 text-dark">
           {{ $t('common.price') }}:&nbsp{{ item.product?.price }}
@@ -41,8 +41,9 @@
               <div
                 role="button"
                 class="mb-1 rounded rounded-pill btn btn-danger"
+                @click="cancelOrder"
               >
-                {{ $t('transaction.button.stop') }}
+                {{ $t('transaction.button.cancel_order') }}
               </div>
             </div>
           </div>
@@ -108,6 +109,7 @@
               <div
                 role="button"
                 class="mb-1 rounded rounded-pill btn btn-danger"
+                @click="refuseToSell"
               >
                 {{ $t('transaction.button.refuse_to_sell') }}
               </div>
@@ -121,15 +123,6 @@
                 @click="setDeliveredGoods"
               >
                 {{ $t('transaction.button.delivered_goods') }}
-              </div>
-            </div>
-            <div class="d-flex flex-column">
-              <div
-                role="button"
-                class="mb-1 rounded rounded-pill btn btn-danger"
-                @click="dispute"
-              >
-                {{ $t('transaction.button.dispute') }}
               </div>
             </div>
           </div>
@@ -146,7 +139,8 @@
           </div>
           <div
             v-if="
-              (item.state === TRANSACTION_STATE.DONE_SET_WINNER || item.state === TRANSACTION_STATE.DONE_SET_RECEIVED_GOODS) &&
+              (item.state === TRANSACTION_STATE.DONE_SET_WINNER ||
+                item.state === TRANSACTION_STATE.DONE_SET_RECEIVED_GOODS) &&
               item.winnerAlias === authStore.getAlias
             "
           >
@@ -174,7 +168,7 @@
               </div>
               <div
                 role="button"
-                class="mb-1 rounded rounded-pill btn btn-danger"
+                class="mb-1 rounded rounded-pill btn btn-success"
                 @click="setWinner(TRANSACTION_SIDE.SELLER)"
               >
                 {{ $t('transaction.button.seller_wins') }}
@@ -183,7 +177,7 @@
           </div>
         </div>
         <div v-else>{{ $t('common.error.something_is_wrong') }}</div>
-      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -240,33 +234,52 @@ export default {
   methods: {
     async acceptToSell() {
       const { err, ok } = await this.transactionStore.acceptToSell(this.soul)
-      debugger
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_accept_to_sell'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
     async pay() {
       const { err, ok } = await this.transactionStore.pay(this.soul)
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_pay'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
+      }
+    },
+    async cancelOrder() {
+      const { err, ok } = await this.transactionStore.cancelOrder(this.soul)
+      if (ok) {
+        await putNotification({
+          message: this.t('notification.transaction.done_cancel_order'),
+        })
+      } else if (err) {
+        await putNotification({ message: this.t(err) })
+      }
+    },
+    async refuseToSell() {
+      const { err, ok } = await this.transactionStore.refuseToSell(this.soul)
+      if (ok) {
+        await putNotification({
+          message: this.t('notification.transaction.done_refuse_to_sell'),
+        })
+      } else if (err) {
+        await putNotification({ message: this.t(err) })
       }
     },
     async dispute() {
       const { err, ok } = await this.transactionStore.dispute(this.soul)
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_dispute'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
     async setDeliveredGoods() {
@@ -274,11 +287,11 @@ export default {
         this.soul
       )
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_set_delivered_goods'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
     async setReceivedGoods() {
@@ -286,11 +299,11 @@ export default {
         this.soul
       )
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_set_received_goods'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
     async setWinner(winner: TRANSACTION_SIDE) {
@@ -299,11 +312,11 @@ export default {
         winner
       )
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_set_winner'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
     async getMoney(winner: TRANSACTION_SIDE) {
@@ -312,11 +325,11 @@ export default {
         winner
       )
       if (ok) {
-        putNotification({
+        await putNotification({
           message: this.t('notification.transaction.done_get_money'),
         })
       } else if (err) {
-        putNotification({ message: this.t(err) })
+        await putNotification({ message: this.t(err) })
       }
     },
   },

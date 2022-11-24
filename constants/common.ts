@@ -26,3 +26,11 @@ export const MARKET_ROUTE = {
 export const TRANSACTIONS_ROUTE = {
   INDEX: 'transactions',
 }
+
+export enum GLOBAL_DIALOG {
+  WARNING = 'global-dialog-warning',
+}
+
+export const WARNING_TYPE = {
+  DELETE: 'delete'
+}

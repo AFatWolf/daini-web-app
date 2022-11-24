@@ -51,7 +51,6 @@ export const useAuthStore = defineStore('auth', {
     recall() {
       const gun = useGun()
       const user = gun.user().recall({ sessionStorage: true }, (ack) => {
-        this.loading.userInfo = false
         this.userInfo = ack
         this.isLoggedIn = true
         this.fetchUserRef()
@@ -70,6 +69,7 @@ export const useAuthStore = defineStore('auth', {
       })
     },
     logIn(body: ISignUpParams) {
+
       const gun = useGun()
       const onLogin = (ack) => {
         this.loading.userInfo = false
@@ -82,7 +82,6 @@ export const useAuthStore = defineStore('auth', {
       }
 
       const user = gun.user().recall({ sessionStorage: true })
-
       this.loading.userInfo = true
       user.auth(body.username, body.password, onLogin)
     },

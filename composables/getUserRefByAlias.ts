@@ -8,6 +8,6 @@ import { useGun } from '@gun-vue/composables'
 export const getUserRefByAlias = async (alias) => {
     const gun = useGun()
     const user = await useOnceToPromise(gun.user().get(alias))
-    debugger
+
     return user
 }

@@ -12,13 +12,16 @@
           {{ $t('item.price') }}:&nbsp{{ item.price }}
         </div>
         <div
-          v-if="item.leftQuantity || item.leftQuantity === 0"
+          v-if="item.leftQuantity"
           class="fs-7 d-flex flex-row"
         >
           <div class="text-dark">{{ item.leftQuantity }}&nbsp</div>
           <div class="text-secondary">
             {{ $t('item.left') }}
           </div>
+        </div>
+        <div v-else-if="item.leftQuantity === 0">
+          <div class="text-danger">{{ $t('market.sold_out') }}</div>
         </div>
       </div>
 
@@ -54,6 +57,10 @@ export default {
   methods: {
     async onPurchase() {
       const { t, transactionStore, item, productSoul } = this
+      if (item.leftQuantity <= 0) {
+        await putNotification({ message: t('error.no_product_left') })
+        return
+      }
       const quantity = 1 // TODO-REFACTOR: fix this
       const order: IOrder = {
         name: item.name,
@@ -62,16 +69,16 @@ export default {
         price: item.price * quantity,
         sellerAlias: item.sellerAlias,
         meditatorAlias:
-          'MTgzjtlGTz8d4EyOxeRbFw94A-9i09ZwmwG-uAOvgw0.1LVb2lzKP6GXuk2wdcL3cb4bA69IThblD-g0G4k8504', // TODO-REMOVE
+          'XNKD4Nt89yDgpek_dW9-QzcAl_oJx0AlM7GEJSB76qs.763oIibNTRelwTZbRCFXTFx5PgxBihIXRW08HTdAMvk', // TODO-REMOVE
       }
 
       const { data, err, ok } = await transactionStore.buy(order)
       if (err) {
         console.error(t(err))
-        putNotification(t(err))
+        await putNotification({ message: t(err) })
         return
       } else if (ok) {
-        putNotification({ message: t('notification.market.buy_success') })
+        await putNotification({ message: t('notification.market.buy_success') })
       }
       console.log(data)
     },

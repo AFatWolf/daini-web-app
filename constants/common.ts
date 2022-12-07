@@ -1,10 +1,10 @@
-export const DATABASE_KEY = 'test-25122000' // test env
+export const DATABASE_KEY = 'test-25122000-' // test env
 
-export const WAREHOUSE_KEY = 'warehouse'
+export const WAREHOUSE_KEY = DATABASE_KEY + 'warehouse'
 
-export const TRANSACTIONS_KEY = 'transactions'
+export const TRANSACTIONS_KEY = DATABASE_KEY + 'transactions'
 
-export const USERS_KEY = 'daini-users'
+export const USERS_KEY = DATABASE_KEY + 'daini-users'
 
 export const HOME_ROUTE = {
     HOME: '/',

@@ -27,6 +27,7 @@ export default {
     // Keys are peer URL
     const peers = Object.keys(peersData)
     if (peers.length > 0) {
+      // Choose the first
       const GUNpeer = useStorage('peer', defaultPeer)
       GUNpeer.value = peers[0]
     }

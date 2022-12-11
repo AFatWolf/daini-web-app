@@ -7,6 +7,11 @@ export default defineNuxtConfig({
   css: ['@/assets/styles/custom.scss'],
   script: ['~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'],
   ssr: false,
+  runtimeConfig: {
+    public: {
+      meditatorPublicKey: process.env.MEDITATOR_PUBLIC_KEY
+    }
+  }
   // alias: {
   //   '~': resolve('.'),
   //   '@': resolve('.'),

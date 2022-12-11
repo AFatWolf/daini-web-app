@@ -39,7 +39,7 @@ export const peer = useStorage("peer", defaultPeer);
 export const relay = reactive({
     list: [],
     peer: peer.value,
-    host: new URL(peer.value).hostname,
+    host: new URL(peer.value || defaultPeer).hostname,
     status: 'offline',
     started: 0,
     pulse: 0,

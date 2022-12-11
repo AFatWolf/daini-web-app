@@ -46,17 +46,19 @@ export default {
   setup(props) {
     const productSoul = getGunNodeSoul(props.item)
     const transactionStore = useTransactionStore()
+    const config = useRuntimeConfig()
     const { t } = useLang()
 
     return {
       t,
       productSoul,
       transactionStore,
+      config,
     }
   },
   methods: {
     async onPurchase() {
-      const { t, transactionStore, item, productSoul } = this
+      const { t, transactionStore, item, productSoul, config } = this
       if (item.leftQuantity <= 0) {
         await putNotification({ message: t('error.no_product_left') })
         return
@@ -69,9 +71,10 @@ export default {
         price: item.price * quantity,
         sellerAlias: item.sellerAlias,
         meditatorAlias:
-          'XNKD4Nt89yDgpek_dW9-QzcAl_oJx0AlM7GEJSB76qs.763oIibNTRelwTZbRCFXTFx5PgxBihIXRW08HTdAMvk', // TODO-REMOVE
+          config.meditatorPublicKey,
       }
-
+      console.log("Meditator public key: ", config.meditatorPublicKey)
+      
       const { data, err, ok } = await transactionStore.buy(order)
       if (err) {
         console.error(t(err))

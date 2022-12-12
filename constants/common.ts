@@ -7,24 +7,24 @@ export const TRANSACTIONS_KEY = DATABASE_KEY + 'transactions'
 export const USERS_KEY = DATABASE_KEY + 'daini-users'
 
 export const HOME_ROUTE = {
-    HOME: '/',
-    INDEX: 'index',
-    LOGIN: 'login',
-    SIGNUP: 'signup',
+  HOME: '/',
+  INDEX: 'index',
+  LOGIN: { name: 'login' },
+  SIGNUP: { name: 'signup' },
 }
 
 export const WAREHOUSE_ROUTE = {
-  INDEX: 'warehouse',
+  INDEX: { name: 'warehouse' },
   DETAIL: 'warehouse-productSoul',
-  SELL: 'sell',
+  SELL: { name: 'sell' },
 }
 
 export const MARKET_ROUTE = {
-  INDEX: 'market',
+  INDEX: { name: 'market' },
 }
 
 export const TRANSACTIONS_ROUTE = {
-  INDEX: 'transactions',
+  INDEX: { name: 'transactions' },
 }
 
 export enum GLOBAL_DIALOG {
@@ -32,5 +32,5 @@ export enum GLOBAL_DIALOG {
 }
 
 export const WARNING_TYPE = {
-  DELETE: 'delete'
+  DELETE: 'delete',
 }

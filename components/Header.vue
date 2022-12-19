@@ -144,10 +144,10 @@ export default {
     isActive(route) {
       // https://v3.router.vuejs.org/api/#route-object-properties
       const objs = this.$route.matched
-      const splittedRoute = useSplit(route, '-')
-
+      const splittedRoute = useSplit(route.name, '-')
+      const isIndex = splittedRoute[0] === '' && objs[0].name === 'index'
       return (
-        objs.length && splittedRoute.length && objs[0].name === splittedRoute[0]
+        objs.length && splittedRoute.length && (objs[0].name === splittedRoute[0] || isIndex)
       )
     },
     logout() {

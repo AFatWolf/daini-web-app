@@ -9,7 +9,7 @@
       </div>
       <div class="d-flex flex-row">
         <div class="fs-7 flex-grow-1 text-dark">
-          {{ $t('item.price') }}:&nbsp{{ item.price }}
+          {{ $t('item.price') }}:&nbsp{{ item.price }}&nbsp¥
         </div>
         <div
           v-if="item.leftQuantity"

@@ -97,9 +97,7 @@ export default {
       // await await putNotification({
       //   message: 'Hello',
       // })
-      await putNotification({
-        message: 'Hello',
-      })
+      useGun().get("test-25122000-/test-25122000-transactions/[\"047a06997506befafab097686...").put({ product: { name: "shounen manga"} })
     },
   },
 }

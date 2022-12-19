@@ -1,8 +1,8 @@
 export default {
-  app_name: 'DAINI',
+  app_name: 'PACT',
   tag_line_1: 'Buy safe. Sell safe. ',
-  tag_line_2: "No intermediary. That's DAINI",
-  tag_line_3: "Buy safe. Sell safe.\nThat's DAINI",
+  tag_line_2: "No intermediary. That's PACT",
+  tag_line_3: "Buy safe. Sell safe.\nThat's PACT",
   login: 'Log In',
   signup: 'Sign Up',
   logout: 'Log Out',

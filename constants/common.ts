@@ -1,4 +1,5 @@
-export const DATABASE_KEY = 'test-25122000-' // test env
+// export const DATABASE_KEY = 'test-25122000-' // test env
+export const DATABASE_KEY = 'pact-20001225' // product env
 
 export const WAREHOUSE_KEY = DATABASE_KEY + 'warehouse'
 
